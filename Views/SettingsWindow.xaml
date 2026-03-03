@@ -9,7 +9,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -451,34 +450,34 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
+
+                <StackPanel x:Name="PanelAddWidgets" Margin="0,12,0,0">
+                    <TextBlock Text="Add Widgets" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <ItemsControl x:Name="LstWidgetTypes">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Name, StringFormat=Add {0}}"
+                                        Tag="{Binding Name}"
+                                        Click="BtnAddWidget_Click"
+                                        Padding="10,6" Margin="0,0,6,6"
+                                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
-        <StackPanel x:Name="PanelAddWidgets" Grid.Row="1" Margin="0,12,0,0">
-            <TextBlock Text="Add Widgets" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
-            <ItemsControl x:Name="LstWidgetTypes">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Content="{Binding Name, StringFormat=Add {0}}"
-                                Tag="{Binding Name}"
-                                Click="BtnAddWidget_Click"
-                                Padding="10,6" Margin="0,0,6,6"
-                                Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
-
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button Content="Save" Click="BtnSave_Click" Padding="20,8" Margin="0,0,8,0"
                     Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
             <Button Content="Apply" Click="BtnApply_Click" Padding="20,8" Margin="0,0,8,0"
-                    Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                    Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
             <Button Content="Close" Click="BtnClose_Click" Padding="20,8"
                     Background="{DynamicResource SecondaryButtonBrush}" Foreground="White" BorderBrush="Transparent"/>
         </StackPanel>

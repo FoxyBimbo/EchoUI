@@ -617,7 +617,7 @@ public partial class SettingsWindow : Window
 
         if (!isWidgetSettings)
         {
-            _settings.AccentColor = TxtAccentColor.Text;
+            _settings.AccentColor = TxtAccentColor.Text.Trim();
             _settings.ThemeMode = SelectedThemeMode;
 
             if (SelectedThemeMode == "Custom")

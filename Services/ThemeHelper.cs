@@ -33,13 +33,27 @@ public static class ThemeHelper
     /// </summary>
     public static ThemeColors ResolveColors(AppSettings settings)
     {
-        return settings.ThemeMode switch
+        var colors = settings.ThemeMode switch
         {
             "Light" => ThemeColors.Light,
             "Dark" => ThemeColors.Dark,
             "Custom" => settings.CustomTheme ?? ThemeColors.Dark,
             _ => IsLightTheme() ? ThemeColors.Light : ThemeColors.Dark // Auto
         };
+
+        if (!string.IsNullOrWhiteSpace(settings.AccentColor))
+        {
+            try
+            {
+                ParseColor(settings.AccentColor.Trim());
+                colors.Accent = settings.AccentColor.Trim();
+            }
+            catch
+            {
+            }
+        }
+
+        return colors;
     }
 
     /// <summary>
