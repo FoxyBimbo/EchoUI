@@ -5,11 +5,11 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using EchoUI.Models;
-using EchoUI.Services;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
 using MediaColor = System.Windows.Media.Color;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class WeatherWidget : Window
 {
@@ -179,7 +179,7 @@ public partial class WeatherWidget : Window
     private static HttpClient CreateHttpClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("EchoUI/1.0");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("PrismPaneWidgets/1.0");
         return client;
     }
 

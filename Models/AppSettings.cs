@@ -2,7 +2,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EchoUI.Models;
+namespace PrismPane_Widgets.Models;
 
 public class AppSettings
 {
@@ -172,7 +172,7 @@ public class AppSettings
     }
 
     private static readonly string SettingsDir =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EchoUI");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PrismPane Widgets");
 
     private static readonly string SettingsPath =
         Path.Combine(SettingsDir, "settings.json");

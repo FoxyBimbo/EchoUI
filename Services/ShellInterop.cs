@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 public static partial class ShellInterop
 {
@@ -165,7 +165,7 @@ public static partial class ShellInterop
 
     // ── Work Area Reservation ───────────────────────────────
     // Shrinks the desktop work area so that maximized windows
-    // leave room for the EchoUI bar at the bottom. Uses real
+    // leave room for the PrismPane Widgets bar at the bottom. Uses real
     // screen pixels (not WPF DIPs) to avoid DPI-scaling issues.
 
     public static void ReserveWorkArea(int barHeightPx)
@@ -197,7 +197,7 @@ public static partial class ShellInterop
         _workAreaModified = false;
     }
 
-    // ── Position the EchoUI window using raw pixels ─────────
+    // ── Position the PrismPane Widgets window using raw pixels ─────────
     // WPF positions use DIPs; we bypass that by calling
     // MoveWindow directly with pixel coordinates so the bar
     // sits flush at the true bottom of the screen.

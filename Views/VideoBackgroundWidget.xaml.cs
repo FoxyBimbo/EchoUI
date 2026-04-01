@@ -3,10 +3,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using EchoUI.Models;
-using EchoUI.Services;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class VideoBackgroundWidget : Window
 {

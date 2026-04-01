@@ -1,8 +1,8 @@
 using System.Windows;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class ShortcutEditDialog : Window
 {

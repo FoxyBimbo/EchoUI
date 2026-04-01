@@ -1,7 +1,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 /// <summary>
 /// Shows the native Windows Explorer right-click context menu for a file or folder

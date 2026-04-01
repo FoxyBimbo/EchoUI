@@ -1,7 +1,7 @@
 using System.IO;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 public class ExtensionManager
 {
@@ -15,7 +15,7 @@ public class ExtensionManager
     private readonly HashSet<string> _enabledExtensions = new(StringComparer.OrdinalIgnoreCase);
     private readonly bool _respectEnabledList;
     private static readonly string ExtensionsDir =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EchoUI", "Extensions");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PrismPane_Widgets", "Extensions");
 
     private static readonly string WidgetsDir = Path.Combine(ExtensionsDir, "Widgets");
 
@@ -106,7 +106,7 @@ public class ExtensionManager
         {
             File.WriteAllText(sampleFolder, """
                 // Folder widget – built-in, handled natively.
-                // This marker file tells EchoUI to show the Folder widget.
+                // This marker file tells PrismPane Widgets to show the Folder widget.
                 echo.notify("Folder", "Folder widget is active.");
                 """);
         }
@@ -116,7 +116,7 @@ public class ExtensionManager
         {
             File.WriteAllText(sampleShortcutPanel, """
                 // ShortcutPanel widget – built-in, handled natively.
-                // This marker file tells EchoUI to show the Shortcut Panel widget.
+                // This marker file tells PrismPane Widgets to show the Shortcut Panel widget.
                 echo.notify("ShortcutPanel", "Shortcut panel widget is active.");
                 """);
         }
@@ -126,7 +126,7 @@ public class ExtensionManager
         {
             File.WriteAllText(sampleTitleBar, """
                 // TitleBar widget – built-in, handled natively.
-                // This marker file tells EchoUI to show the TitleBar widget.
+                // This marker file tells PrismPane Widgets to show the TitleBar widget.
                 echo.notify("TitleBar", "Title bar widget is active.");
                 """);
         }

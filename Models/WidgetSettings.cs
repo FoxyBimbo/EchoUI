@@ -1,4 +1,4 @@
-namespace EchoUI.Models;
+namespace PrismPane_Widgets.Models;
 
 /// <summary>
 /// Per-widget settings with generic properties shared by all widgets

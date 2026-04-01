@@ -6,7 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 public static partial class IconHelper
 {

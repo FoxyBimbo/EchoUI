@@ -6,14 +6,14 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using EchoUI.Models;
-using EchoUI.Services;
-using EchoUI.Views;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
+using PrismPane_Widgets.Views;
 using Application = System.Windows.Application;
 using Color = System.Windows.Media.Color;
 using Screen = System.Windows.Forms.Screen;
 
-namespace EchoUI;
+namespace PrismPane_Widgets;
 
 public partial class MainWindow : Window
 {
@@ -120,11 +120,11 @@ public partial class MainWindow : Window
             _ => Dispatcher.BeginInvoke(RestoreHiddenWidgets),
             null, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(300));
 
-        // ── System tray icon ────────────────────────────────
+        // -- System tray icon --------------------------------
         _trayIcon = new System.Windows.Forms.NotifyIcon
         {
             Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/AppIcon.ico"))!.Stream),
-            Text = "EchoUI",
+            Text = "PrismPane Widgets",
             Visible = true
         };
 
@@ -183,7 +183,7 @@ public partial class MainWindow : Window
         DockManager.RestoreAll();
     }
 
-    // ── Widget management ───────────────────────────────────
+    // -- Widget management -----------------------------------
 
     private static string NormalizeWidgetKind(string kind) =>
         kind == "DesktopFolder" ? "Folder" : kind;
@@ -735,7 +735,7 @@ public partial class MainWindow : Window
         });
     }
 
-    // ── Settings ────────────────────────────────────────────
+    // -- Settings --------------------------------------------
     private void OpenSettings()
     {
         var win = new SettingsWindow(
@@ -944,7 +944,7 @@ public partial class MainWindow : Window
         settings.ShowDialog();
     }
 
-    // ── Exit ────────────────────────────────────────────────
+    // -- Exit ------------------------------------------------
     private void ExitApp()
     {
         if (!_isShuttingDown)

@@ -1,6 +1,6 @@
 using System.Windows.Media;
 
-namespace EchoUI.Models;
+namespace PrismPane_Widgets.Models;
 
 /// <summary>
 /// A single shortcut entry inside a Shortcut Panel widget.

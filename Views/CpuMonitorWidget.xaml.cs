@@ -4,12 +4,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using EchoUI.Models;
-using EchoUI.Services;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
 using MediaColor = System.Windows.Media.Color;
 using WPoint = System.Windows.Point;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class CpuMonitorWidget : Window
 {

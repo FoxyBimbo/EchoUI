@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 public static class MediaPlaybackMonitor
 {

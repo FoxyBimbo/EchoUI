@@ -1,12 +1,12 @@
 using System.Windows;
 using System.Windows.Media;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 using Microsoft.Win32;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using Application = System.Windows.Application;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 public static class ThemeHelper
 {

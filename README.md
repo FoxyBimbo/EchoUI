@@ -1,4 +1,4 @@
-# EchoUI
+# PrismPane Widgets
 Just a simple widget tool I'm working on. It was initially built as a Fences Alternative, but working on adding more features. It currently has the following features
 
 * Folder Widget: Lets you select a specific folder on your drive and display all the icons in that folder

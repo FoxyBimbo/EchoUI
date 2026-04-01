@@ -1,4 +1,4 @@
-namespace EchoUI.Models;
+namespace PrismPane_Widgets.Models;
 
 /// <summary>
 /// Complete color scheme for the app or an individual widget.

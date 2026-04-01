@@ -1,7 +1,7 @@
-﻿<Application x:Class="EchoUI.App"
+<Application x:Class="PrismPane_Widgets.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:EchoUI"
+             xmlns:local="clr-namespace:PrismPane_Widgets"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

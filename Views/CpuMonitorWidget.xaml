@@ -1,4 +1,4 @@
-<Window x:Class="EchoUI.Views.CpuMonitorWidget"
+<Window x:Class="PrismPane_Widgets.Views.CpuMonitorWidget"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="CPU Monitor" Width="260" Height="220"

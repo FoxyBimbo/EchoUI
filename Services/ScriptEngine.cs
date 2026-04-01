@@ -1,12 +1,12 @@
 using System.Windows.Media;
 using Jint;
 using NLua;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 using Application = System.Windows.Application;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 public class ScriptEngine
 {

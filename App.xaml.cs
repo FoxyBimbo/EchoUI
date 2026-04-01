@@ -1,7 +1,7 @@
-﻿using EchoUI.Models;
-using EchoUI.Services;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
 
-namespace EchoUI
+namespace PrismPane_Widgets
 {
     public partial class App : System.Windows.Application
     {
@@ -13,9 +13,9 @@ namespace EchoUI
             var colors = ThemeHelper.ResolveColors(settings);
             ThemeHelper.ApplyToApp(colors);
 
-            SessionEnding += (_, _) => EchoUI.MainWindow.DockManager.RestoreAll();
-            Exit += (_, _) => EchoUI.MainWindow.DockManager.RestoreAll();
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => EchoUI.MainWindow.DockManager.RestoreAll();
+            SessionEnding += (_, _) => PrismPane_Widgets.MainWindow.DockManager.RestoreAll();
+            Exit += (_, _) => PrismPane_Widgets.MainWindow.DockManager.RestoreAll();
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => PrismPane_Widgets.MainWindow.DockManager.RestoreAll();
         }
     }
 }

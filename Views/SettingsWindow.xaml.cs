@@ -4,13 +4,13 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using EchoUI.Models;
-using EchoUI.Services;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Button = System.Windows.Controls.Button;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class SettingsWindow : Window
 {
@@ -789,7 +789,7 @@ public partial class SettingsWindow : Window
         {
             Timeout = TimeSpan.FromSeconds(10)
         };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("EchoUI/1.0 (+https://openstreetmap.org)");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("PrismPaneWidgets/1.0 (+https://openstreetmap.org)");
         return client;
     }
 

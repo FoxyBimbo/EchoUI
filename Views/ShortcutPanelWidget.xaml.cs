@@ -7,13 +7,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using EchoUI.Models;
-using EchoUI.Services;
+using PrismPane_Widgets.Models;
+using PrismPane_Widgets.Services;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Button = System.Windows.Controls.Button;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class ShortcutPanelWidget : Window
 {

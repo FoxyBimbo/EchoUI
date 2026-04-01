@@ -1,9 +1,9 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 
-namespace EchoUI.Services;
+namespace PrismPane_Widgets.Services;
 
 /// <summary>
 /// Manages docked widgets on screen edges using the Windows AppBar API
@@ -114,7 +114,7 @@ public partial class WidgetDockManager
         int thicknessPx = DipToPixel(thicknessDip);
 
         // Each AppBar needs a unique callback message id
-        uint callbackMsg = RegisterWindowMessageW($"EchoUI_AppBar_{widgetId}_{hwnd}");
+        uint callbackMsg = RegisterWindowMessageW($"PrismPane_Widgets_AppBar_{widgetId}_{hwnd}");
 
         // 1) Register with the system
         var abd = NewABD(hwnd, callbackMsg);

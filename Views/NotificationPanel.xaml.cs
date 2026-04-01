@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Windows;
-using EchoUI.Models;
+using PrismPane_Widgets.Models;
 
-namespace EchoUI.Views;
+namespace PrismPane_Widgets.Views;
 
 public partial class NotificationPanel : Window
 {
