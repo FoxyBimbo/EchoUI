@@ -15,6 +15,7 @@ public partial class ShortcutEditDialog : Window
 
         TxtName.Text = Result.Name;
         TxtPath.Text = Result.TargetPath;
+        TxtUrl.Text = Result.Url;
         TxtArguments.Text = Result.Arguments;
         TxtIconPath.Text = Result.CustomIconPath;
     }
@@ -47,15 +48,19 @@ public partial class ShortcutEditDialog : Window
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(TxtPath.Text))
+        var hasPath = !string.IsNullOrWhiteSpace(TxtPath.Text);
+        var hasUrl = !string.IsNullOrWhiteSpace(TxtUrl.Text);
+
+        if (!hasPath && !hasUrl)
         {
-            System.Windows.MessageBox.Show("Path is required.", "Validation",
+            System.Windows.MessageBox.Show("Either Path or URL is required.", "Validation",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         Result.Name = TxtName.Text.Trim();
         Result.TargetPath = TxtPath.Text.Trim();
+        Result.Url = TxtUrl.Text.Trim();
         Result.Arguments = TxtArguments.Text.Trim();
         Result.CustomIconPath = TxtIconPath.Text.Trim();
 

@@ -15,6 +15,7 @@ public partial class VideoBackgroundWidget : Window
     private readonly string _widgetId;
     private readonly WidgetSettings _widgetSettings;
     private readonly AppSettings _appSettings;
+    private readonly WidgetMinimizeBehavior _minimizeBehavior;
 
     private readonly DispatcherTimer _gifTimer = new();
     private List<BitmapSource>? _gifFrames;
@@ -29,6 +30,7 @@ public partial class VideoBackgroundWidget : Window
         _widgetId = widgetId;
         _widgetSettings = settings;
         _appSettings = appSettings;
+        _minimizeBehavior = new WidgetMinimizeBehavior(this, RootBorder, InnerLayout, HeaderPanel, ContentPanel, BtnMinimize, _widgetSettings, _appSettings, Height);
 
         Loaded += (_, _) => ApplyWidgetSettingsFromModel();
         Closed += (_, _) =>
@@ -47,11 +49,15 @@ public partial class VideoBackgroundWidget : Window
 
         Topmost = ws.Topmost;
         Opacity = ws.Opacity;
+        RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(1.5) : new Thickness(0);
+        TxtWidgetTitle.Text = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : "Video Widget";
 
         if (ws.Width is > 0)
             Width = ws.Width.Value;
         if (ws.Height is > 0)
             Height = ws.Height.Value;
+
+        _minimizeBehavior.ApplyFromSettings();
 
         if (!ws.Custom.TryGetValue(SourcePathKey, out var sourcePath) || string.IsNullOrWhiteSpace(sourcePath))
         {
@@ -196,7 +202,9 @@ public partial class VideoBackgroundWidget : Window
 
         try
         {
+            if (MainWindow.DragWidgetGroup(this)) return;
             DragMove();
+            MainWindow.SnapManager.OnDragCompleted(this);
         }
         catch
         {

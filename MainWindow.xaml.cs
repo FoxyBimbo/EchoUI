@@ -96,6 +96,10 @@ public partial class MainWindow : Window
     private static readonly IntPtr HWND_NOTOPMOST = new(-2);
 
     public static WidgetDockManager DockManager { get; } = new();
+    public static WidgetSnapManager SnapManager { get; } = new();
+
+    private readonly List<WidgetGroupWindow> _groups = [];
+    private int _groupIdCounter;
 
     public MainWindow()
     {
@@ -119,6 +123,8 @@ public partial class MainWindow : Window
         _showDesktopGuardTimer = new System.Threading.Timer(
             _ => Dispatcher.BeginInvoke(RestoreHiddenWidgets),
             null, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(300));
+
+        SnapManager.GroupRequested += OnGroupRequested;
 
         // -- System tray icon --------------------------------
         _trayIcon = new System.Windows.Forms.NotifyIcon
@@ -170,6 +176,7 @@ public partial class MainWindow : Window
         _widgetsRestored = true;
         _isRestoringWidgetsState = true;
         RestoreOpenWidgets();
+        RestoreWidgetGroups();
         _isRestoringWidgetsState = false;
         Hide();
     }
@@ -317,6 +324,12 @@ public partial class MainWindow : Window
             "Weather" => new WeatherWidget(id, ws, _settings),
             "VideoBackground" => new VideoBackgroundWidget(id, ws, _settings),
             "MediaControl" => new MediaControlWidget(id, ws, _settings),
+            "NetworkTraffic" => new NetworkTrafficWidget(id, ws, _settings),
+            "DiskUsage" => new DiskUsageWidget(id, ws, _settings),
+            "GpuMonitor" => new GpuMonitorWidget(id, ws, _settings),
+            "StickyNotes" => new StickyNotesWidget(id, ws, _settings),
+            "Slideshow" => new SlideshowWidget(id, ws, _settings),
+            "RssFeed" => new RssFeedWidget(id, ws, _settings),
             _ => null
         };
 
@@ -435,6 +448,10 @@ public partial class MainWindow : Window
 
             var source = (HwndSource)PresentationSource.FromVisual(widget)!;
             source.AddHook(ShowDesktopGuardHook);
+
+            // Register for grouping detection
+            if (widget is not MediaControlWidget)
+                SnapManager.Track(widget);
         };
 
         if (widget is not MediaControlWidget)
@@ -657,6 +674,12 @@ public partial class MainWindow : Window
             WeatherWidget ww => ww.WidgetId,
             VideoBackgroundWidget vbw => vbw.WidgetId,
             MediaControlWidget mcw => mcw.WidgetId,
+            NetworkTrafficWidget ntw => ntw.WidgetId,
+            DiskUsageWidget duw => duw.WidgetId,
+            GpuMonitorWidget gmw => gmw.WidgetId,
+            StickyNotesWidget snw => snw.WidgetId,
+            SlideshowWidget ssw => ssw.WidgetId,
+            RssFeedWidget rfw => rfw.WidgetId,
             _ => null
         };
         if (id is null) return;
@@ -678,6 +701,12 @@ public partial class MainWindow : Window
 
         DockManager.Undock(id);
         DockManager.UntrackFloatingWidget(win);
+        SnapManager.Untrack(win);
+
+        // If this widget was inside a group, remove it from the group
+        var group = _groups.FirstOrDefault(g => g.ContainsWidget(id));
+        group?.RemoveWidget(id);
+
         win.Closed -= OnWidgetClosed;
         _widgets.Remove(id);
 
@@ -706,11 +735,26 @@ public partial class MainWindow : Window
     private void CloseAllWidgets()
     {
         _isShuttingDown = true;
+
+        // Persist group state before dissolving so it survives restart
+        PersistGroupState();
+
+        // Dissolve all groups so widget windows get their content back
+        foreach (var group in _groups.ToList())
+        {
+            SnapManager.Untrack(group);
+            DockManager.UntrackFloatingWidget(group);
+            foreach (var wid in group.GetWidgetIds().ToList())
+                group.RemoveWidget(wid);
+        }
+        _groups.Clear();
+
         PersistOpenWidgets();
         foreach (var (id, win) in _widgets.ToList())
         {
             DockManager.Undock(id);
             DockManager.UntrackFloatingWidget(win);
+            SnapManager.Untrack(win);
             win.Closed -= OnWidgetClosed;
             win.Close();
         }
@@ -836,6 +880,12 @@ public partial class MainWindow : Window
             WeatherWidget weatherWidget => weatherWidget.ApplyWidgetSettingsFromModel,
             VideoBackgroundWidget videoBackgroundWidget => videoBackgroundWidget.ApplyWidgetSettingsFromModel,
             MediaControlWidget mediaControlWidget => mediaControlWidget.ApplyWidgetSettingsFromModel,
+            NetworkTrafficWidget networkTrafficWidget => networkTrafficWidget.ApplyWidgetSettingsFromModel,
+            DiskUsageWidget diskUsageWidget => diskUsageWidget.ApplyWidgetSettingsFromModel,
+            GpuMonitorWidget gpuMonitorWidget => gpuMonitorWidget.ApplyWidgetSettingsFromModel,
+            StickyNotesWidget stickyNotesWidget => stickyNotesWidget.ApplyWidgetSettingsFromModel,
+            SlideshowWidget slideshowWidget => slideshowWidget.ApplyWidgetSettingsFromModel,
+            RssFeedWidget rssFeedWidget => rssFeedWidget.ApplyWidgetSettingsFromModel,
             _ => null
         };
 
@@ -848,10 +898,18 @@ public partial class MainWindow : Window
 
     private static string BuildWidgetDisplayName(string widgetId)
     {
+        return BuildWidgetDisplayName(widgetId, null);
+    }
+
+    private static string BuildWidgetDisplayName(string widgetId, WidgetSettings? ws)
+    {
+        if (ws is not null && !string.IsNullOrWhiteSpace(ws.Title))
+            return ws.Title;
+
         var separatorIndex = widgetId.LastIndexOf('_');
         var kind = separatorIndex > 0 ? widgetId[..separatorIndex] : widgetId;
 
-        var displayKind = NormalizeWidgetKind(kind) switch
+        return NormalizeWidgetKind(kind) switch
         {
             "ShortcutPanel" => "Shortcut Panel",
             "TitleBar" => "Title Bar",
@@ -859,10 +917,14 @@ public partial class MainWindow : Window
             "RamMonitor" => "RAM Monitor",
             "VideoBackground" => "Video Widget",
             "MediaControl" => "Media Control",
+            "NetworkTraffic" => "Network Traffic",
+            "DiskUsage" => "Disk Usage",
+            "GpuMonitor" => "GPU Monitor",
+            "StickyNotes" => "Sticky Notes",
+            "Slideshow" => "Slideshow",
+            "RssFeed" => "RSS Feed",
             _ => NormalizeWidgetKind(kind)
         };
-
-        return $"{displayKind} ({widgetId})";
     }
 
     private void RefreshTrayMenu()
@@ -871,33 +933,50 @@ public partial class MainWindow : Window
 
         var builtinWidgets = new[]
         {
-            (Kind: "Folder", DisplayName: "Folder"),
-            (Kind: "ShortcutPanel", DisplayName: "Shortcut Panel"),
-            (Kind: "TitleBar", DisplayName: "Title Bar"),
-            (Kind: "Clock", DisplayName: "Clock"),
-            (Kind: "CpuMonitor", DisplayName: "CPU Monitor"),
-            (Kind: "RamMonitor", DisplayName: "RAM Monitor"),
-            (Kind: "Weather", DisplayName: "Weather"),
-            (Kind: "VideoBackground", DisplayName: "Video"),
-            (Kind: "MediaControl", DisplayName: "Media Control")
+            (Kind: "Folder", DisplayName: "Folder", Category: "Productivity"),
+            (Kind: "ShortcutPanel", DisplayName: "Shortcut Panel", Category: "Productivity"),
+            (Kind: "TitleBar", DisplayName: "Title Bar", Category: "Productivity"),
+            (Kind: "Clock", DisplayName: "Clock", Category: "Productivity"),
+            (Kind: "CpuMonitor", DisplayName: "CPU Monitor", Category: "Monitoring"),
+            (Kind: "RamMonitor", DisplayName: "RAM Monitor", Category: "Monitoring"),
+            (Kind: "Weather", DisplayName: "Weather", Category: "Productivity"),
+            (Kind: "VideoBackground", DisplayName: "Video", Category: "Media"),
+            (Kind: "MediaControl", DisplayName: "Media Control", Category: "Media"),
+            (Kind: "NetworkTraffic", DisplayName: "Network Traffic", Category: "Monitoring"),
+            (Kind: "DiskUsage", DisplayName: "Disk Usage", Category: "Monitoring"),
+            (Kind: "GpuMonitor", DisplayName: "GPU Monitor", Category: "Monitoring"),
+            (Kind: "StickyNotes", DisplayName: "Sticky Notes", Category: "Productivity"),
+            (Kind: "Slideshow", DisplayName: "Slideshow", Category: "Media"),
+            (Kind: "RssFeed", DisplayName: "RSS Feed", Category: "Productivity")
         };
         var builtinWidgetKinds = new HashSet<string>(builtinWidgets.Select(widget => widget.Kind), StringComparer.OrdinalIgnoreCase);
-        foreach (var widget in builtinWidgets)
-            menu.Items.Add($"New {widget.DisplayName} Widget", null, (_, _) => SpawnWidget(widget.Kind));
+
+        var categoryOrder = new[] { "Monitoring", "Media", "Productivity", "Other" };
+        var grouped = builtinWidgets
+            .GroupBy(w => w.Category)
+            .OrderBy(g => Array.IndexOf(categoryOrder, g.Key) is var i && i < 0 ? int.MaxValue : i);
+
+        foreach (var group in grouped)
+        {
+            var sub = new System.Windows.Forms.ToolStripMenuItem(group.Key);
+            foreach (var widget in group)
+                sub.DropDownItems.Add($"{widget.DisplayName} Widget", null, (_, _) => SpawnWidget(widget.Kind));
+            menu.Items.Add(sub);
+        }
 
         var extensionWidgets = _extManager.GetWidgets()
             .Where(w => !builtinWidgetKinds.Contains(w.Name))
             .ToList();
 
-        if (builtinWidgets.Length > 0 && extensionWidgets.Count > 0)
-            menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
+        if (extensionWidgets.Count > 0)
+        {
+            var extSub = new System.Windows.Forms.ToolStripMenuItem("Extensions");
+            foreach (var widget in extensionWidgets)
+                extSub.DropDownItems.Add($"{widget.Name} Widget", null, (_, _) => SpawnWidget(widget.Name));
+            menu.Items.Add(extSub);
+        }
 
-        foreach (var widget in extensionWidgets)
-            menu.Items.Add($"New {widget.Name} Widget", null, (_, _) => SpawnWidget(widget.Name));
-
-        if (menu.Items.Count > 0)
-            menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-
+        menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         menu.Items.Add("Settings", null, (_, _) => OpenSettings());
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitApp());
@@ -942,6 +1021,242 @@ public partial class MainWindow : Window
             settings.Owner = owner;
 
         settings.ShowDialog();
+    }
+
+    // -- Widget group management --------------------------------
+
+    /// <summary>
+    /// If the given widget is inside a tab group, call <c>DragMove()</c>
+    /// on the group window so the entire group moves together.
+    /// Returns <c>true</c> when the widget was in a group (caller should skip its own drag).
+    /// </summary>
+    public static bool DragWidgetGroup(Window widget)
+    {
+        var main = (MainWindow)Application.Current.MainWindow;
+        var id = main.FindWidgetId(widget);
+        if (id is null) return false;
+
+        var group = main.FindGroupForWidget(id);
+        if (group is null) return false;
+
+        group.DragMove();
+        SnapManager.OnDragCompleted(group);
+        return true;
+    }
+
+    private string? FindWidgetId(Window window) =>
+        _widgets.FirstOrDefault(pair => pair.Value == window).Key;
+
+    private WidgetGroupWindow? FindGroupForWidget(string widgetId) =>
+        _groups.FirstOrDefault(g => g.ContainsWidget(widgetId));
+
+    private string GetWidgetTabName(string widgetId) =>
+        BuildWidgetDisplayName(widgetId, _settings.Widgets.GetValueOrDefault(widgetId));
+
+    /// <summary>
+    /// Update the group tab label and refresh custom colors for a widget after its settings changed.
+    /// Safe to call even when the widget is not grouped (no-op).
+    /// </summary>
+    public static void RefreshWidgetGroupTab(string widgetId, WidgetSettings ws)
+    {
+        var main = (MainWindow)Application.Current.MainWindow;
+        var group = main.FindGroupForWidget(widgetId);
+        if (group is null) return;
+        group.UpdateTabDisplayName(widgetId, BuildWidgetDisplayName(widgetId, ws));
+        group.RefreshWidgetResources(widgetId);
+    }
+
+    private void OnGroupRequested(Window dragged, Window target)
+    {
+        // Don't group special widgets
+        if (dragged is MediaControlWidget or TitleBarWidget) return;
+        if (target is MediaControlWidget or TitleBarWidget) return;
+
+        // ── Dragged is a group window ──
+        if (dragged is WidgetGroupWindow draggedGroup)
+        {
+            if (target is WidgetGroupWindow) return; // skip group-to-group merge
+
+            var targetId = FindWidgetId(target);
+            if (targetId == null || FindGroupForWidget(targetId) != null) return;
+
+            draggedGroup.AddWidget(targetId, target, GetWidgetTabName(targetId));
+            return;
+        }
+
+        var draggedId = FindWidgetId(dragged);
+        if (draggedId == null) return;
+
+        // If dragged is already in a group, remove it first
+        var existingDragGroup = FindGroupForWidget(draggedId);
+        existingDragGroup?.RemoveWidget(draggedId);
+
+        // ── Target is a group window → add to it ──
+        if (target is WidgetGroupWindow targetGroup)
+        {
+            targetGroup.AddWidget(draggedId, dragged, GetWidgetTabName(draggedId));
+            return;
+        }
+
+        var targetId2 = FindWidgetId(target);
+        if (targetId2 == null) return;
+
+        // ── Target is already in a group → add dragged to that group ──
+        var existingTargetGroup = FindGroupForWidget(targetId2);
+        if (existingTargetGroup != null)
+        {
+            existingTargetGroup.AddWidget(draggedId, dragged, GetWidgetTabName(draggedId));
+            return;
+        }
+
+        // ── Create new group ──
+        var targetWs = _settings.GetWidgetSettings(targetId2);
+
+        var group = new WidgetGroupWindow
+        {
+            GroupId = $"Group_{++_groupIdCounter}",
+            WindowStartupLocation = WindowStartupLocation.Manual,
+            Left = target.Left,
+            Top = target.Top,
+            Width = Math.Max(target.ActualWidth, dragged.ActualWidth),
+            Height = Math.Max(target.ActualHeight, dragged.ActualHeight) + 34,
+            Topmost = targetWs.Topmost,
+            Opacity = targetWs.Opacity
+        };
+
+        ThemeHelper.ApplyToElement(group, targetWs.CustomColors);
+
+        group.AddWidget(targetId2, target, GetWidgetTabName(targetId2));
+        group.AddWidget(draggedId, dragged, GetWidgetTabName(draggedId));
+
+        RegisterGroupWindow(group);
+        group.Show();
+    }
+
+    private void RegisterGroupWindow(WidgetGroupWindow group)
+    {
+        _groups.Add(group);
+        DockManager.TrackFloatingWidget(group);
+
+        group.Dissolved += OnGroupDissolved;
+        group.TabDetached += OnGroupTabDetached;
+        group.GroupChanged += OnGroupChanged;
+
+        group.SourceInitialized += (_, _) =>
+        {
+            var helper = new WindowInteropHelper(group);
+            var hwnd = helper.Handle;
+
+            var exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+            exStyle = (exStyle | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW;
+            SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle);
+            helper.Owner = IntPtr.Zero;
+
+            var source = (HwndSource)PresentationSource.FromVisual(group)!;
+            source.AddHook(ShowDesktopGuardHook);
+
+                SnapManager.Track(group);
+                };
+
+                if (!_isRestoringWidgetsState)
+                    PersistGroupState();
+            }
+
+    private void OnGroupDissolved(WidgetGroupWindow group)
+    {
+        SnapManager.Untrack(group);
+        DockManager.UntrackFloatingWidget(group);
+        _groups.Remove(group);
+        if (!_isShuttingDown && !_isRestoringWidgetsState)
+        {
+            PersistGroupState();
+            ScheduleSettingsSave();
+        }
+    }
+
+    private void OnGroupTabDetached(WidgetGroupWindow group, string widgetId, Window widget)
+    {
+        if (!_isShuttingDown && !_isRestoringWidgetsState)
+        {
+            PersistGroupState();
+            ScheduleSettingsSave();
+        }
+    }
+
+    private void OnGroupChanged(WidgetGroupWindow group)
+    {
+        if (_isShuttingDown || _isRestoringWidgetsState) return;
+        PersistGroupState();
+        ScheduleSettingsSave();
+    }
+
+    private void PersistGroupState()
+    {
+        _settings.WidgetGroups.Clear();
+        foreach (var group in _groups)
+        {
+            var ids = group.GetWidgetIds();
+            if (ids.Count < 2) continue;
+
+            _settings.WidgetGroups.Add(new WidgetGroupSettings
+            {
+                GroupId = group.GroupId,
+                WidgetIds = ids.ToList(),
+                ActiveTab = group.ActiveTabIndex,
+                Left = group.Left,
+                Top = group.Top,
+                Width = group.Width,
+                Height = group.Height
+            });
+        }
+    }
+
+    private void RestoreWidgetGroups()
+    {
+        foreach (var gs in _settings.WidgetGroups.ToList())
+        {
+            // Collect the widget windows that are actually open
+            var members = new List<(string Id, Window Win)>();
+            foreach (var wid in gs.WidgetIds)
+            {
+                if (_widgets.TryGetValue(wid, out var win))
+                    members.Add((wid, win));
+            }
+
+            if (members.Count < 2) continue;
+
+            // Bump the counter so new groups don't collide with restored IDs
+            if (gs.GroupId.StartsWith("Group_") &&
+                int.TryParse(gs.GroupId.AsSpan(6), out var num) && num >= _groupIdCounter)
+            {
+                _groupIdCounter = num;
+            }
+
+            var firstWs = _settings.GetWidgetSettings(members[0].Id);
+
+            var group = new WidgetGroupWindow
+            {
+                GroupId = gs.GroupId,
+                WindowStartupLocation = WindowStartupLocation.Manual,
+                Left = gs.Left ?? members[0].Win.Left,
+                Top = gs.Top ?? members[0].Win.Top,
+                Width = gs.Width ?? members[0].Win.Width,
+                Height = gs.Height ?? members[0].Win.Height,
+                Topmost = firstWs.Topmost,
+                Opacity = firstWs.Opacity
+            };
+
+            ThemeHelper.ApplyToElement(group, firstWs.CustomColors);
+
+            foreach (var (id, win) in members)
+                group.AddWidget(id, win, GetWidgetTabName(id));
+
+            if (gs.ActiveTab >= 0 && gs.ActiveTab < members.Count)
+                group.ActivateTab(gs.ActiveTab);
+
+            RegisterGroupWindow(group);
+            group.Show();
+        }
     }
 
     // -- Exit ------------------------------------------------

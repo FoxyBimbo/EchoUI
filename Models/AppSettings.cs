@@ -25,6 +25,9 @@ public class AppSettings
     /// <summary>Per-widget settings keyed by widget id.</summary>
     public Dictionary<string, WidgetSettings> Widgets { get; set; } = [];
 
+    /// <summary>Persisted widget group (tab container) definitions.</summary>
+    public List<WidgetGroupSettings> WidgetGroups { get; set; } = [];
+
     /// <summary>
     /// Returns settings for a widget, creating defaults if missing.
     /// </summary>
@@ -64,19 +67,19 @@ public class AppSettings
         var kind = widgetId.Contains('_') ? widgetId[..widgetId.LastIndexOf('_')] : widgetId;
         return kind switch
         {
-            "Folder" or "DesktopFolder" => new WidgetSettings { Kind = "Folder", Topmost = false, Opacity = 1.0 },
+            "Folder" or "DesktopFolder" => new WidgetSettings { Kind = "Folder", Topmost = false, Opacity = 0.85 },
             "ShortcutPanel" => new WidgetSettings
             {
                 Kind = "ShortcutPanel",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Custom = new() { ["Title"] = "Shortcuts" }
             },
             "TitleBar" => new WidgetSettings
             {
                 Kind = "TitleBar",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Height = 36,
                 DockEdge = DockEdge.Top,
                 DockThickness = 36
@@ -85,7 +88,7 @@ public class AppSettings
             {
                 Kind = "Clock",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Width = 220,
                 Height = 220,
                 Custom = new()
@@ -100,7 +103,7 @@ public class AppSettings
             {
                 Kind = "CpuMonitor",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Width = 260,
                 Height = 220,
                 Custom = new()
@@ -115,7 +118,7 @@ public class AppSettings
             {
                 Kind = "RamMonitor",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Width = 260,
                 Height = 220,
                 Custom = new()
@@ -130,7 +133,7 @@ public class AppSettings
             {
                 Kind = "Weather",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Width = 280,
                 Height = 260,
                 Custom = new()
@@ -151,7 +154,7 @@ public class AppSettings
             {
                 Kind = "VideoBackground",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Width = 360,
                 Height = 240,
                 Custom = new()
@@ -163,9 +166,95 @@ public class AppSettings
             {
                 Kind = "MediaControl",
                 Topmost = false,
-                Opacity = 1.0,
+                Opacity = 0.85,
                 Width = 320,
                 Height = 44
+            },
+            "NetworkTraffic" => new WidgetSettings
+            {
+                Kind = "NetworkTraffic",
+                Topmost = false,
+                Opacity = 0.85,
+                Width = 260,
+                Height = 220,
+                Custom = new()
+                {
+                    ["NetDownloadColor"] = "#FF34D399",
+                    ["NetUploadColor"] = "#FF60A5FA"
+                }
+            },
+            "DiskUsage" => new WidgetSettings
+            {
+                Kind = "DiskUsage",
+                Topmost = false,
+                Opacity = 0.85,
+                Width = 260,
+                Height = 220,
+                Custom = new()
+                {
+                    ["DiskDrive"] = "C",
+                    ["DiskLowColor"] = "#FF34D399",
+                    ["DiskMediumColor"] = "#FFFBBF24",
+                    ["DiskHighColor"] = "#FFF87171"
+                }
+            },
+            "GpuMonitor" => new WidgetSettings
+            {
+                Kind = "GpuMonitor",
+                Topmost = false,
+                Opacity = 0.85,
+                Width = 260,
+                Height = 220,
+                Custom = new()
+                {
+                    ["GpuLowColor"] = "#FF34D399",
+                    ["GpuMediumColor"] = "#FFFBBF24",
+                    ["GpuHighColor"] = "#FFF87171"
+                }
+            },
+            "StickyNotes" => new WidgetSettings
+            {
+                Kind = "StickyNotes",
+                Topmost = false,
+                Opacity = 0.85,
+                Width = 260,
+                Height = 280,
+                Custom = new()
+                {
+                    ["NoteContent"] = string.Empty,
+                    ["NoteFontFamily"] = "Segoe UI",
+                    ["NoteFontSize"] = "14",
+                    ["NoteFontColor"] = string.Empty
+                }
+            },
+            "Slideshow" => new WidgetSettings
+            {
+                Kind = "Slideshow",
+                Topmost = false,
+                Opacity = 0.85,
+                Width = 360,
+                Height = 280,
+                Custom = new()
+                {
+                    ["SlideshowFolder"] = string.Empty,
+                    ["SlideshowInterval"] = "5",
+                    ["SlideshowRandom"] = "false"
+                }
+            },
+            "RssFeed" => new WidgetSettings
+            {
+                Kind = "RssFeed",
+                Topmost = false,
+                Opacity = 0.85,
+                Width = 300,
+                Height = 320,
+                Custom = new()
+                {
+                    ["RssFeedUrl"] = "https://feeds.bbci.co.uk/news/rss.xml",
+                    ["RssMaxItems"] = "15",
+                    ["RssRefreshInterval"] = "3",
+                    ["RssRefreshUnit"] = "Hours"
+                }
             },
             _ => new WidgetSettings { Kind = kind }
         };

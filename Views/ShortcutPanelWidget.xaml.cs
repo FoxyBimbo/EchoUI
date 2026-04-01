@@ -91,9 +91,15 @@ public partial class ShortcutPanelWidget : Window
         Topmost = ws.Topmost;
         _defaultTopmost = ws.Topmost;
         Opacity = ws.Opacity;
+        RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(1.5) : new Thickness(0);
 
-        ws.Custom.TryGetValue("Title", out var title);
-        TxtTitle.Text = string.IsNullOrEmpty(title) ? "Shortcuts" : title;
+        var displayTitle = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : null;
+        if (displayTitle is null)
+        {
+            ws.Custom.TryGetValue("Title", out var legacyTitle);
+            displayTitle = string.IsNullOrEmpty(legacyTitle) ? "Shortcuts" : legacyTitle;
+        }
+        TxtTitle.Text = displayTitle;
 
         _isMinimized = ws.IsMinimized;
         if (!_isMinimized
@@ -264,11 +270,16 @@ public partial class ShortcutPanelWidget : Window
              Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
         {
             _titleDragging = true;
+            if (MainWindow.DragWidgetGroup(this))
+                return;
             if (_isDocked)
                 Undock(true);
             DragMove();
-            ResetUpwardExpansion();
-            TryAutoDockFromPosition();
+            if (!MainWindow.SnapManager.OnDragCompleted(this))
+            {
+                ResetUpwardExpansion();
+                TryAutoDockFromPosition();
+            }
         }
     }
 
@@ -553,6 +564,13 @@ public partial class ShortcutPanelWidget : Window
 
     private static void LaunchShortcut(ShortcutItem s)
     {
+        if (!string.IsNullOrWhiteSpace(s.Url))
+        {
+            try { Process.Start(new ProcessStartInfo(s.Url) { UseShellExecute = true }); }
+            catch { }
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(s.TargetPath)) return;
         try
         {
@@ -662,12 +680,18 @@ public partial class ShortcutPanelWidget : Window
         if (e.LeftButton != MouseButtonState.Pressed)
             return;
 
+        if (MainWindow.DragWidgetGroup(this))
+            return;
+
         if (_isDocked)
             Undock(true);
 
         DragMove();
-        ResetUpwardExpansion();
-        TryAutoDockFromPosition();
+        if (!MainWindow.SnapManager.OnDragCompleted(this))
+        {
+            ResetUpwardExpansion();
+            TryAutoDockFromPosition();
+        }
     }
 
     private void ResetUpwardExpansion()

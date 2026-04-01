@@ -20,4 +20,5 @@ public class ExtensionInfo
     public ExtensionKind Kind { get; set; }
     public bool IsEnabled { get; set; } = true;
     public string Description { get; set; } = string.Empty;
+    public string Category { get; set; } = "Other";
 }

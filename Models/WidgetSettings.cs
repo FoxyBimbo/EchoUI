@@ -9,8 +9,14 @@ public class WidgetSettings
     /// <summary>Widget kind — used to create the correct window type.</summary>
     public string Kind { get; set; } = "Folder";
 
+    /// <summary>User-customisable display name shown in headers and group tabs.</summary>
+    public string? Title { get; set; }
+
     /// <summary>Window opacity (0.0 – 1.0).</summary>
     public double Opacity { get; set; } = 1.0;
+
+    /// <summary>Whether the widget border is visible.</summary>
+    public bool ShowBorder { get; set; } = true;
 
     /// <summary>Whether the widget stays on top of other applications.</summary>
     public bool Topmost { get; set; } = true;

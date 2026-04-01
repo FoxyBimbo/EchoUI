@@ -1,20 +1,75 @@
-﻿<Window x:Class="PrismPane_Widgets.Views.SettingsWindow"
+<Window x:Class="PrismPane_Widgets.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PrismPane Widgets Settings" Height="700" Width="520"
+        Title="PrismPane Widgets Settings" Height="700" Width="580"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}"
         ResizeMode="NoResize">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel>
+        <!-- Navigation Sidebar -->
+        <Border x:Name="NavSidebar" Grid.Column="0" Width="48"
+                Background="{DynamicResource ControlBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+            <ListBox x:Name="NavList" Background="Transparent" BorderThickness="0"
+                     Foreground="{DynamicResource ForegroundBrush}"
+                     Margin="0,12,-1,0"
+                     SelectionChanged="NavList_SelectionChanged">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="4,2"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="Bd" Background="Transparent"
+                                            CornerRadius="6" Padding="10,8">
+                                        <ContentPresenter HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background"
+                                                    Value="{DynamicResource WindowBackgroundBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="Background"
+                                                    Value="{DynamicResource WindowBackgroundBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBoxItem x:Name="NavAppearance" Tag="Appearance" IsSelected="True" ToolTip="Appearance">
+                    <TextBlock Text="&#xE790;" FontFamily="Segoe MDL2 Assets" FontSize="18"/>
+                </ListBoxItem>
+                <ListBoxItem x:Name="NavWidgets" Tag="Widgets" ToolTip="Widgets">
+                    <TextBlock Text="&#xE74C;" FontFamily="Segoe MDL2 Assets" FontSize="18"/>
+                </ListBoxItem>
+            </ListBox>
+        </Border>
 
-                <StackPanel x:Name="PanelThemeSettings">
+        <!-- Content Area -->
+        <Grid Grid.Column="1" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="0,0,12,0">
+
+                    <StackPanel x:Name="SectionAppearance">
+
+                    <StackPanel x:Name="PanelThemeSettings">
                     <!-- ?? Theme Settings ???????????????????????????? -->
                     <TextBlock Text="Theme" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -39,7 +94,7 @@
                             <TextBlock Text="Window Bg:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomWindowBg" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchWindowBg" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomWindowBg}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -48,7 +103,7 @@
                             <TextBlock Text="Control Bg:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomControlBg" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchControlBg" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomControlBg}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -57,7 +112,7 @@
                             <TextBlock Text="Foreground:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomForeground" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchForeground" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomForeground}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -66,7 +121,7 @@
                             <TextBlock Text="Muted Text:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomMuted" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchMuted" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomMuted}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -75,7 +130,7 @@
                             <TextBlock Text="Border:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomBorder" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchBorder" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomBorder}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -84,7 +139,7 @@
                             <TextBlock Text="Accent:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomAccent" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchAccent" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomAccent}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -93,7 +148,7 @@
                             <TextBlock Text="Secondary Btn:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomSecondary" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchSecondary" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomSecondary}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -102,7 +157,7 @@
                             <TextBlock Text="Dropdown Bg:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomDropdownBg" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchDropdownBg" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomDropdownBg}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -111,7 +166,7 @@
                             <TextBlock Text="Dropdown Hover:" Width="120" VerticalAlignment="Center"/>
                             <TextBox x:Name="TxtCustomDropdownHover" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
                             <Border x:Name="SwatchDropdownHover" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
-                            <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                            <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                     Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCustomDropdownHover}"
                                     Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                     ToolTip="Pick color"/>
@@ -125,20 +180,23 @@
 
                 <StackPanel x:Name="PanelGeneralSettings">
                     <!-- ?? General Settings ?????????????????????????? -->
-                    <TextBlock Text="General Settings" FontSize="18" FontWeight="Bold" Margin="0,8,0,8"/>
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                         <TextBlock Text="Accent Color:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <TextBox x:Name="TxtAccentColor" Width="100" Text="#FF3A86FF"
                                  Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                        <Button Content="??" Width="26" Height="20" Margin="6,0,0,0" Padding="0"
+                        <Border x:Name="SwatchAccentColor" Width="20" Height="20" Margin="6,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                        <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                 Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtAccentColor}"
                                 Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                 ToolTip="Pick color"/>
                     </StackPanel>
                 </StackPanel>
 
+                    </StackPanel>
+
+                    <StackPanel x:Name="SectionWidgets" Visibility="Collapsed">
+
                 <StackPanel x:Name="PanelWidgetSettings">
-                    <!-- ?? Widget Settings ??????????????????????????? -->
                     <TextBlock Text="Widget Settings" FontSize="18" FontWeight="Bold" Margin="0,16,0,8"/>
 
                     <StackPanel x:Name="PanelWidgetSelector" Orientation="Horizontal" Margin="0,0,0,8">
@@ -155,6 +213,12 @@
                             <ComboBoxItem Content="Weather" Tag="Weather"/>
                             <ComboBoxItem Content="Video Widget" Tag="VideoBackground"/>
                             <ComboBoxItem Content="Media Control" Tag="MediaControl"/>
+                            <ComboBoxItem Content="Network Traffic" Tag="NetworkTraffic"/>
+                            <ComboBoxItem Content="Disk Usage" Tag="DiskUsage"/>
+                            <ComboBoxItem Content="GPU Monitor" Tag="GpuMonitor"/>
+                            <ComboBoxItem Content="Sticky Notes" Tag="StickyNotes"/>
+                            <ComboBoxItem Content="Slideshow" Tag="Slideshow"/>
+                            <ComboBoxItem Content="RSS Feed" Tag="RssFeed"/>
                         </ComboBox>
                     </StackPanel>
 
@@ -162,13 +226,26 @@
                             CornerRadius="4" Padding="12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                <TextBlock Text="Opacity:" VerticalAlignment="Center" Width="100"/>
-                                <Slider x:Name="SliderOpacity" Minimum="0.1" Maximum="1.0" Width="180"
-                                        Value="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                <TextBlock Text="Name:" VerticalAlignment="Center" Width="100"/>
+                                <TextBox x:Name="TxtWidgetName" Width="200"
+                                         Background="{DynamicResource ControlBackgroundBrush}"
+                                         Foreground="{DynamicResource ForegroundBrush}"
+                                         BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Transparency:" VerticalAlignment="Center" Width="100"/>
+                                <Slider x:Name="SliderOpacity" Minimum="0.35" Maximum="1.0" Width="180"
+                                        Value="0.85" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        PreviewMouseLeftButtonDown="Slider_PreviewMouseLeftButtonDown"
                                         ValueChanged="SliderOpacity_Changed"/>
-                                <TextBlock x:Name="TxtOpacityValue" Text="100%" VerticalAlignment="Center"
+                                <TextBlock x:Name="TxtOpacityValue" Text="85%" VerticalAlignment="Center"
                                            Margin="8,0,0,0" Width="40"/>
                             </StackPanel>
+
+                            <CheckBox x:Name="ChkShowBorder" Content="Show border"
+                                      IsChecked="True"
+                                      Foreground="{DynamicResource ForegroundBrush}" Margin="0,0,0,8"/>
 
                             <CheckBox x:Name="ChkTopmost" Content="Show on top of other applications"
                                       Foreground="{DynamicResource ForegroundBrush}" Margin="0,0,0,8"
@@ -190,7 +267,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Window Bg:" Width="110" VerticalAlignment="Center"/>
                                     <TextBox x:Name="TxtWcWindowBg" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWcWindowBg" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWcWindowBg}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                             ToolTip="Pick color"/>
@@ -198,7 +276,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Control Bg:" Width="110" VerticalAlignment="Center"/>
                                     <TextBox x:Name="TxtWcControlBg" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWcControlBg" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWcControlBg}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                             ToolTip="Pick color"/>
@@ -206,7 +285,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Foreground:" Width="110" VerticalAlignment="Center"/>
                                     <TextBox x:Name="TxtWcForeground" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWcForeground" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWcForeground}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                             ToolTip="Pick color"/>
@@ -214,7 +294,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Accent:" Width="110" VerticalAlignment="Center"/>
                                     <TextBox x:Name="TxtWcAccent" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWcAccent" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWcAccent}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                             ToolTip="Pick color"/>
@@ -222,7 +303,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Border:" Width="110" VerticalAlignment="Center"/>
                                     <TextBox x:Name="TxtWcBorder" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWcBorder" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWcBorder}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                             ToolTip="Pick color"/>
@@ -230,7 +312,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Muted Text:" Width="110" VerticalAlignment="Center"/>
                                     <TextBox x:Name="TxtWcMuted" Width="90" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWcMuted" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWcMuted}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                                             ToolTip="Pick color"/>
@@ -277,7 +360,8 @@
                                     <TextBlock Text="Hour color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtClockHourColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchClockHourColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtClockHourColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -286,7 +370,8 @@
                                     <TextBlock Text="Minute color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtClockMinuteColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchClockMinuteColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtClockMinuteColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -295,7 +380,8 @@
                                     <TextBlock Text="Second color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtClockSecondColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchClockSecondColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtClockSecondColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -318,7 +404,8 @@
                                     <TextBlock Text="Low color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtCpuLowColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchCpuLowColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCpuLowColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -327,7 +414,8 @@
                                     <TextBlock Text="Medium color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtCpuMediumColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchCpuMediumColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCpuMediumColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -336,7 +424,8 @@
                                     <TextBlock Text="High color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtCpuHighColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchCpuHighColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtCpuHighColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -359,7 +448,8 @@
                                     <TextBlock Text="Low color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtRamLowColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchRamLowColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtRamLowColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -368,7 +458,8 @@
                                     <TextBlock Text="Medium color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtRamMediumColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchRamMediumColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtRamMediumColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -377,7 +468,8 @@
                                     <TextBlock Text="High color:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtRamHighColor" Width="90" Padding="4,2"
                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchRamHighColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtRamHighColor}"
                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
                                 </StackPanel>
@@ -412,7 +504,8 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Freezing (&lt;0°C):" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtWeatherFreezeColor" Width="90" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWeatherFreezeColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWeatherFreezeColor}"
                                             ToolTip="Pick color"/>
                                 </StackPanel>
@@ -420,7 +513,8 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Cool:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtWeatherCoolColor" Width="90" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWeatherCoolColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWeatherCoolColor}"
                                             ToolTip="Pick color"/>
                                 </StackPanel>
@@ -428,7 +522,8 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Warm:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtWeatherWarmColor" Width="90" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWeatherWarmColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWeatherWarmColor}"
                                             ToolTip="Pick color"/>
                                 </StackPanel>
@@ -436,7 +531,8 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Hot:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtWeatherHotColor" Width="90" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWeatherHotColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWeatherHotColor}"
                                             ToolTip="Pick color"/>
                                 </StackPanel>
@@ -444,7 +540,8 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="Extreme hot:" VerticalAlignment="Center" Width="100"/>
                                     <TextBox x:Name="TxtWeatherExtremeColor" Width="90" Padding="4,2"/>
-                                    <Button Content="??" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                    <Border x:Name="SwatchWeatherExtremeColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtWeatherExtremeColor}"
                                             ToolTip="Pick color"/>
                                 </StackPanel>
@@ -470,6 +567,228 @@
                                         Click="BtnBrowseVideoBackground_Click"
                                         Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
                             </StackPanel>
+
+                            <StackPanel x:Name="PanelNetworkTrafficSettings" Visibility="Collapsed">
+                                <TextBlock Text="Network Traffic Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Download color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtNetDownloadColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchNetDownloadColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtNetDownloadColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Upload color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtNetUploadColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchNetUploadColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                            Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtNetUploadColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PanelDiskUsageSettings" Visibility="Collapsed">
+                                <TextBlock Text="Disk Usage Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Drive letter:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtDiskDrive" Width="40" Padding="4,2"
+                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                             MaxLength="1"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Low color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtDiskLowColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchDiskLowColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtDiskLowColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Medium color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtDiskMediumColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchDiskMediumColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtDiskMediumColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="High color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtDiskHighColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchDiskHighColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtDiskHighColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PanelGpuSettings" Visibility="Collapsed">
+                                <TextBlock Text="GPU Monitor Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Low color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtGpuLowColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchGpuLowColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtGpuLowColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Medium color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtGpuMediumColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchGpuMediumColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtGpuMediumColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="High color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtGpuHighColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchGpuHighColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="&#x1F3A8;" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                             Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtGpuHighColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PanelStickyNotesSettings" Visibility="Collapsed">
+                                <TextBlock Text="Sticky Notes Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Font:" VerticalAlignment="Center" Width="100"/>
+                                    <ComboBox x:Name="CmbStickyNoteFont" Width="200"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Font Size:" VerticalAlignment="Center" Width="100"/>
+                                    <Slider x:Name="SliderStickyNoteFontSize" Minimum="8" Maximum="45" Width="180"
+                                            Value="14" TickFrequency="1" IsSnapToTickEnabled="True"
+                                            PreviewMouseLeftButtonDown="Slider_PreviewMouseLeftButtonDown"
+                                            ValueChanged="SliderStickyNoteFontSize_Changed"/>
+                                    <TextBlock x:Name="TxtStickyNoteFontSizeValue" Text="14" VerticalAlignment="Center"
+                                               Margin="8,0,0,0" Width="30"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Font Color:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtStickyNoteFontColor" Width="90" Padding="4,2"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <Border x:Name="SwatchStickyNoteFontColor" Width="20" Height="20" Margin="4,0,0,0" CornerRadius="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                    <Button Content="🎨" Width="26" Height="20" Margin="4,0,0,0" Padding="0"
+                                            Click="BtnPickColor_Click" Tag="{Binding ElementName=TxtStickyNoteFontColor}"
+                                            Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                            ToolTip="Pick color"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PanelSlideshowSettings" Visibility="Collapsed">
+                                <TextBlock Text="Slideshow Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Folder:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtSlideshowFolder" Width="220" Padding="4,2"
+                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                             FontSize="11"/>
+                                </StackPanel>
+
+                                <Button Content="Browse&#x2026;" Click="BtnBrowseSlideshowFolder_Click"
+                                        Width="90" Padding="8,4" Margin="0,4,0,6"
+                                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Interval (sec):" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtSlideshowInterval" Width="60" Padding="4,2"
+                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <CheckBox x:Name="ChkSlideshowRandom" Content="Random order"
+                                          Foreground="{DynamicResource ForegroundBrush}" Margin="0,0,0,4"/>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PanelRssFeedSettings" Visibility="Collapsed">
+                                <TextBlock Text="RSS Feed Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Feed URL:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtRssFeedUrl" Width="260" Padding="4,2"
+                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                             FontSize="11"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Max items:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtRssMaxItems" Width="60" Padding="4,2"
+                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Refresh every:" VerticalAlignment="Center" Width="100"/>
+                                    <TextBox x:Name="TxtRssRefreshInterval" Width="50" Padding="4,2"
+                                             Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                                    <ComboBox x:Name="CmbRssRefreshUnit" Width="100" Margin="6,0,0,0"
+                                              Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                                        <ComboBoxItem Content="Seconds" Tag="Seconds"/>
+                                        <ComboBoxItem Content="Minutes" Tag="Minutes"/>
+                                        <ComboBoxItem Content="Hours" Tag="Hours"/>
+                                        <ComboBoxItem Content="Days" Tag="Days"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PanelShortcutPanelSettings" Visibility="Collapsed">
+                                <TextBlock Text="Shortcut Panel Options" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,8,0,6"/>
+
+                                <TextBlock Text="Shortcuts:" Foreground="{DynamicResource ForegroundBrush}" Margin="0,0,0,4"/>
+                                <Border Background="{DynamicResource WindowBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1" CornerRadius="4" Padding="4" Margin="0,0,0,6">
+                                    <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl x:Name="LstShortcuts">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel Margin="0,0,0,4">
+                                                        <Button Content="✏" DockPanel.Dock="Right"
+                                                                Tag="{Binding}"
+                                                                Click="BtnEditShortcut_Click"
+                                                                Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}"
+                                                                BorderBrush="Transparent" FontSize="14"
+                                                                Padding="4,0" Cursor="Hand" VerticalAlignment="Center"
+                                                                ToolTip="Edit shortcut"/>
+                                                        <TextBlock Text="{Binding Name}" Foreground="{DynamicResource ForegroundBrush}"
+                                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Border>
+                                <TextBlock x:Name="TxtNoShortcuts" Text="No shortcuts configured."
+                                           Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,0,0,4"
+                                           Visibility="Collapsed"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -477,18 +796,28 @@
                 <StackPanel x:Name="PanelAddWidgets" Margin="0,12,0,0">
                     <TextBlock Text="Add Widgets" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
                     <ItemsControl x:Name="LstWidgetTypes">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Content="{Binding Name, StringFormat=Add {0}}"
-                                        Tag="{Binding Name}"
-                                        Click="BtnAddWidget_Click"
-                                        Padding="10,6" Margin="0,0,6,6"
-                                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent" />
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="{Binding Key}" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource MutedForegroundBrush}" Margin="0,0,0,4"/>
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding Name, StringFormat=Add {0}}"
+                                                        Tag="{Binding Name}"
+                                                        Click="BtnAddWidget_Click"
+                                                        Padding="10,6" Margin="0,0,6,6"
+                                                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -541,16 +870,19 @@
                         </Grid>
                     </Border>
                 </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-            <Button Content="Save" Click="BtnSave_Click" Padding="20,8" Margin="0,0,8,0"
-                    Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
-            <Button Content="Apply" Click="BtnApply_Click" Padding="20,8" Margin="0,0,8,0"
-                    Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
-            <Button Content="Close" Click="BtnClose_Click" Padding="20,8"
-                    Background="{DynamicResource SecondaryButtonBrush}" Foreground="White" BorderBrush="Transparent"/>
-        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="Save" Click="BtnSave_Click" Padding="20,8" Margin="0,0,8,0"
+                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
+                <Button Content="Apply" Click="BtnApply_Click" Padding="20,8" Margin="0,0,8,0"
+                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderBrush="Transparent"/>
+                <Button Content="Close" Click="BtnClose_Click" Padding="20,8"
+                        Background="{DynamicResource SecondaryButtonBrush}" Foreground="White" BorderBrush="Transparent"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

@@ -33,6 +33,7 @@ public partial class CpuMonitorWidget : Window
     private MediaColor _lowColor;
     private MediaColor _mediumColor;
     private MediaColor _highColor;
+    private readonly WidgetMinimizeBehavior _minimizeBehavior;
 
     public string WidgetId => _widgetId;
 
@@ -42,6 +43,7 @@ public partial class CpuMonitorWidget : Window
         _widgetId = widgetId;
         _widgetSettings = settings;
         _appSettings = appSettings;
+        _minimizeBehavior = new WidgetMinimizeBehavior(this, RootBorder, InnerLayout, HeaderPanel, ContentPanel, BtnMinimize, _widgetSettings, _appSettings, Height);
 
         ApplyWidgetSettingsFromModel();
 
@@ -69,11 +71,15 @@ public partial class CpuMonitorWidget : Window
         ThemeHelper.ApplyToElement(this, ws.CustomColors);
         Topmost = ws.Topmost;
         Opacity = ws.Opacity;
+        RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(1.5) : new Thickness(0);
+        TxtWidgetTitle.Text = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : "CPU";
 
         if (ws.Width is > 0)
             Width = ws.Width.Value;
         if (ws.Height is > 0)
             Height = ws.Height.Value;
+
+        _minimizeBehavior.ApplyFromSettings();
 
         _viewMode = ws.Custom.TryGetValue(CpuViewModeKey, out var viewMode) && viewMode == "Speedometer"
             ? "Speedometer"
@@ -261,7 +267,11 @@ public partial class CpuMonitorWidget : Window
     private void RootBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            if (MainWindow.DragWidgetGroup(this)) return;
             DragMove();
+            MainWindow.SnapManager.OnDragCompleted(this);
+        }
     }
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)

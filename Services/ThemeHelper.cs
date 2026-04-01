@@ -72,12 +72,9 @@ public static class ThemeHelper
         dict["DropdownBackgroundBrush"] = Brush(colors.DropdownBackground);
         dict["DropdownItemHoverBrush"] = Brush(colors.DropdownItemHover);
 
-        // Widget-specific: semi-transparent variant used for floating root border
-        var wbColor = ParseColor(colors.WindowBackground);
-        wbColor.A = 0xDD;
-        var semiTransparent = new SolidColorBrush(wbColor);
-        semiTransparent.Freeze();
-        dict["WindowBackgroundSemiBrush"] = semiTransparent;
+        // Widget-specific background. Keep it fully opaque so widget transparency
+        // is controlled only by the widget opacity setting.
+        dict["WindowBackgroundSemiBrush"] = Brush(colors.WindowBackground);
 
         // Merge control style templates that reference the brush keys above
         dict.MergedDictionaries.Add(new ResourceDictionary

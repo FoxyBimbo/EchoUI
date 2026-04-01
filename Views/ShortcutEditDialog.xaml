@@ -1,12 +1,13 @@
 <Window x:Class="PrismPane_Widgets.Views.ShortcutEditDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Edit Shortcut" Width="400" Height="280"
+        Title="Edit Shortcut" Width="400" Height="330"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}"
         ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
     <Grid Margin="16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -33,20 +34,25 @@
                 Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="Transparent"
                 Padding="8,4" Margin="0,0,0,8"/>
 
-        <TextBlock Grid.Row="2" Text="Arguments:" VerticalAlignment="Center" Margin="0,0,0,8"/>
-        <TextBox x:Name="TxtArguments" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+        <TextBlock Grid.Row="2" Text="URL:" VerticalAlignment="Center" Margin="0,0,0,8"/>
+        <TextBox x:Name="TxtUrl" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
                  Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                  Padding="4,4" Margin="0,0,0,8"/>
 
-        <TextBlock Grid.Row="3" Text="Custom Icon:" VerticalAlignment="Center" Margin="0,0,0,8"/>
-        <TextBox x:Name="TxtIconPath" Grid.Row="3" Grid.Column="1"
+        <TextBlock Grid.Row="3" Text="Arguments:" VerticalAlignment="Center" Margin="0,0,0,8"/>
+        <TextBox x:Name="TxtArguments" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                 Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                 Padding="4,4" Margin="0,0,0,8"/>
+
+        <TextBlock Grid.Row="4" Text="Custom Icon:" VerticalAlignment="Center" Margin="0,0,0,8"/>
+        <TextBox x:Name="TxtIconPath" Grid.Row="4" Grid.Column="1"
                  Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
                  Padding="4,4" Margin="0,0,4,8"/>
-        <Button Grid.Row="3" Grid.Column="2" Content="Browse…" Click="BtnBrowseIcon_Click"
+        <Button Grid.Row="4" Grid.Column="2" Content="Browse…" Click="BtnBrowseIcon_Click"
                 Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="Transparent"
                 Padding="8,4" Margin="0,0,0,8"/>
 
-        <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal"
+        <StackPanel Grid.Row="6" Grid.ColumnSpan="3" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <Button Content="Save" Click="BtnSave_Click" Padding="20,8" Margin="0,0,8,0"
                     Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource ForegroundBrush}" BorderBrush="Transparent"/>

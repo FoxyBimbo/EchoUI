@@ -17,6 +17,7 @@ public partial class ClockWidget : Window
     private readonly WidgetSettings _widgetSettings;
     private readonly AppSettings _appSettings;
     private readonly DispatcherTimer _clockTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
+    private readonly WidgetMinimizeBehavior _minimizeBehavior;
 
     public string WidgetId => _widgetId;
 
@@ -26,6 +27,7 @@ public partial class ClockWidget : Window
         _widgetId = widgetId;
         _widgetSettings = settings;
         _appSettings = appSettings;
+        _minimizeBehavior = new WidgetMinimizeBehavior(this, RootBorder, InnerLayout, HeaderPanel, ContentPanel, BtnMinimize, _widgetSettings, _appSettings, Height);
 
         ApplyWidgetSettingsFromModel();
 
@@ -50,11 +52,15 @@ public partial class ClockWidget : Window
         ThemeHelper.ApplyToElement(this, ws.CustomColors);
         Topmost = ws.Topmost;
         Opacity = ws.Opacity;
+        RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(1.5) : new Thickness(0);
+        TxtWidgetTitle.Text = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : "Clock";
 
         if (ws.Width is > 0)
             Width = ws.Width.Value;
         if (ws.Height is > 0)
             Height = ws.Height.Value;
+
+        _minimizeBehavior.ApplyFromSettings();
 
         var mode = ws.Custom.TryGetValue(ClockModeKey, out var savedMode) && savedMode == "Analog"
             ? "Analog"
@@ -111,7 +117,11 @@ public partial class ClockWidget : Window
     private void RootBorder_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+        {
+            if (MainWindow.DragWidgetGroup(this)) return;
             DragMove();
+            MainWindow.SnapManager.OnDragCompleted(this);
+        }
     }
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)

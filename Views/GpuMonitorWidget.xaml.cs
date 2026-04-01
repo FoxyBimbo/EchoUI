@@ -1,31 +1,28 @@
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using PrismPane_Widgets.Models;
 using PrismPane_Widgets.Services;
 using MediaColor = System.Windows.Media.Color;
-using WPoint = System.Windows.Point;
 
 namespace PrismPane_Widgets.Views;
 
-public partial class RamMonitorWidget : Window
+public partial class GpuMonitorWidget : Window
 {
-    private const string RamViewModeKey = "RamViewMode";
-    private const string RamLowColorKey = "RamLowColor";
-    private const string RamMediumColorKey = "RamMediumColor";
-    private const string RamHighColorKey = "RamHighColor";
+    private const string GpuLowColorKey = "GpuLowColor";
+    private const string GpuMediumColorKey = "GpuMediumColor";
+    private const string GpuHighColorKey = "GpuHighColor";
 
     private readonly string _widgetId;
     private readonly WidgetSettings _widgetSettings;
     private readonly AppSettings _appSettings;
-    private readonly DispatcherTimer _ramTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+    private readonly DispatcherTimer _gpuTimer = new() { Interval = TimeSpan.FromSeconds(2) };
 
     private double _currentUsage;
+    private List<PerformanceCounter>? _gpuCounters;
 
-    private string _viewMode = "Bar";
     private MediaColor _lowColor;
     private MediaColor _mediumColor;
     private MediaColor _highColor;
@@ -33,7 +30,7 @@ public partial class RamMonitorWidget : Window
 
     public string WidgetId => _widgetId;
 
-    public RamMonitorWidget(string widgetId, WidgetSettings settings, AppSettings appSettings)
+    public GpuMonitorWidget(string widgetId, WidgetSettings settings, AppSettings appSettings)
     {
         InitializeComponent();
         _widgetId = widgetId;
@@ -43,15 +40,20 @@ public partial class RamMonitorWidget : Window
 
         ApplyWidgetSettingsFromModel();
 
-        _ramTimer.Tick += (_, _) => UpdateUsage();
+        _gpuTimer.Tick += (_, _) => UpdateUsage();
         UsageBarTrack.SizeChanged += (_, _) => UpdateBarFill();
 
         Loaded += (_, _) =>
         {
+            InitializeCounters();
             UpdateUsage();
-            _ramTimer.Start();
+            _gpuTimer.Start();
         };
-        Closed += (_, _) => _ramTimer.Stop();
+        Closed += (_, _) =>
+        {
+            _gpuTimer.Stop();
+            DisposeCounters();
+        };
     }
 
     private WidgetSettings SyncWidgetSettings()
@@ -67,7 +69,7 @@ public partial class RamMonitorWidget : Window
         Topmost = ws.Topmost;
         Opacity = ws.Opacity;
         RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(1.5) : new Thickness(0);
-        TxtWidgetTitle.Text = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : "RAM";
+        TxtWidgetTitle.Text = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : "GPU";
 
         if (ws.Width is > 0)
             Width = ws.Width.Value;
@@ -76,20 +78,13 @@ public partial class RamMonitorWidget : Window
 
         _minimizeBehavior.ApplyFromSettings();
 
-        _viewMode = ws.Custom.TryGetValue(RamViewModeKey, out var viewMode) && viewMode == "Speedometer"
-            ? "Speedometer"
-            : "Bar";
-
-        _lowColor = ReadColor(ws, RamLowColorKey, "#FF34D399");
-        _mediumColor = ReadColor(ws, RamMediumColorKey, "#FFFBBF24");
-        _highColor = ReadColor(ws, RamHighColorKey, "#FFF87171");
+        _lowColor = ReadColor(ws, GpuLowColorKey, "#FF34D399");
+        _mediumColor = ReadColor(ws, GpuMediumColorKey, "#FFFBBF24");
+        _highColor = ReadColor(ws, GpuHighColorKey, "#FFF87171");
 
         LowIndicator.Fill = new SolidColorBrush(_lowColor);
         MediumIndicator.Fill = new SolidColorBrush(_mediumColor);
         HighIndicator.Fill = new SolidColorBrush(_highColor);
-
-        BarPanel.Visibility = _viewMode == "Bar" ? Visibility.Visible : Visibility.Collapsed;
-        SpeedometerPanel.Visibility = _viewMode == "Speedometer" ? Visibility.Visible : Visibility.Collapsed;
 
         UpdateVisuals();
         _appSettings.Save();
@@ -111,12 +106,85 @@ public partial class RamMonitorWidget : Window
         return ThemeHelper.ParseColor(fallback);
     }
 
+    private void InitializeCounters()
+    {
+        try
+        {
+            var category = new PerformanceCounterCategory("GPU Engine");
+            var instanceNames = category.GetInstanceNames();
+
+            _gpuCounters = [];
+            foreach (var instance in instanceNames)
+            {
+                if (!instance.Contains("engtype_3D", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var counters = category.GetCounters(instance);
+                foreach (var counter in counters)
+                {
+                    if (counter.CounterName.Equals("Utilization Percentage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        counter.NextValue();
+                        _gpuCounters.Add(counter);
+                    }
+                    else
+                    {
+                        counter.Dispose();
+                    }
+                }
+            }
+        }
+        catch
+        {
+            _gpuCounters = null;
+        }
+    }
+
+    private void DisposeCounters()
+    {
+        if (_gpuCounters is null)
+            return;
+
+        foreach (var counter in _gpuCounters)
+        {
+            try { counter.Dispose(); }
+            catch { }
+        }
+
+        _gpuCounters = null;
+    }
+
     private void UpdateUsage()
     {
-        if (TryReadRamUsagePercent(out var usage))
+        var usage = ReadGpuUsage();
+        if (usage >= 0)
             _currentUsage = usage;
 
         UpdateVisuals();
+    }
+
+    private double ReadGpuUsage()
+    {
+        if (_gpuCounters is null || _gpuCounters.Count == 0)
+        {
+            InitializeCounters();
+            if (_gpuCounters is null || _gpuCounters.Count == 0)
+                return 0;
+        }
+
+        try
+        {
+            double total = 0;
+            foreach (var counter in _gpuCounters)
+                total += counter.NextValue();
+
+            return Math.Clamp(total, 0, 100);
+        }
+        catch
+        {
+            DisposeCounters();
+            return -1;
+        }
     }
 
     private void UpdateVisuals()
@@ -136,10 +204,6 @@ public partial class RamMonitorWidget : Window
         };
 
         UpdateBarFill();
-
-        NeedleRotate.Angle = -90 + (_currentUsage / 100.0) * 180;
-        GaugeArc.Stroke = usageBrush;
-        GaugeArc.Data = BuildGaugeArc(_currentUsage);
     }
 
     private void UpdateBarFill()
@@ -151,86 +215,12 @@ public partial class RamMonitorWidget : Window
         UsageBarFill.Width = width * (_currentUsage / 100.0);
     }
 
-    private Geometry BuildGaugeArc(double usage)
-    {
-        const double centerX = 90;
-        const double centerY = 90;
-        const double radius = 70;
-
-        var percentage = Math.Clamp(usage, 0, 100) / 100.0;
-        if (percentage <= 0)
-        {
-            var empty = new PathGeometry();
-            empty.Figures.Add(new PathFigure { StartPoint = new WPoint(20, 90), IsClosed = false, IsFilled = false });
-            return empty;
-        }
-
-        var startAngle = 180.0;
-        var endAngle = startAngle - (percentage * 180.0);
-
-        var startRadians = startAngle * Math.PI / 180.0;
-        var startX = centerX + radius * Math.Cos(startRadians);
-        var startY = centerY - radius * Math.Sin(startRadians);
-
-        var points = new PointCollection();
-        for (var angle = startAngle - 3.0; angle > endAngle; angle -= 3.0)
-        {
-            var radians = angle * Math.PI / 180.0;
-            points.Add(new WPoint(
-                centerX + radius * Math.Cos(radians),
-                centerY - radius * Math.Sin(radians)));
-        }
-
-        var endRadians = endAngle * Math.PI / 180.0;
-        points.Add(new WPoint(
-            centerX + radius * Math.Cos(endRadians),
-            centerY - radius * Math.Sin(endRadians)));
-
-        var figure = new PathFigure { StartPoint = new WPoint(startX, startY), IsClosed = false, IsFilled = false };
-        figure.Segments.Add(new PolyLineSegment(points, true));
-
-        var geometry = new PathGeometry();
-        geometry.Figures.Add(figure);
-        return geometry;
-    }
-
     private MediaColor GetUsageColor(double usage) => usage switch
     {
         < 40 => _lowColor,
         < 75 => _mediumColor,
         _ => _highColor
     };
-
-    private static bool TryReadRamUsagePercent(out double usage)
-    {
-        var status = new MEMORYSTATUSEX();
-        if (!GlobalMemoryStatusEx(status))
-        {
-            usage = 0;
-            return false;
-        }
-
-        usage = Math.Clamp(status.dwMemoryLoad, 0, 100);
-        return true;
-    }
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private sealed class MEMORYSTATUSEX
-    {
-        public uint dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
-        public uint dwMemoryLoad;
-        public ulong ullTotalPhys;
-        public ulong ullAvailPhys;
-        public ulong ullTotalPageFile;
-        public ulong ullAvailPageFile;
-        public ulong ullTotalVirtual;
-        public ulong ullAvailVirtual;
-        public ulong ullAvailExtendedVirtual;
-    }
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
 
     private void RootBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {

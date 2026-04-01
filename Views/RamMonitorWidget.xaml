@@ -15,23 +15,26 @@
             <Border.Effect>
                 <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5" Color="Black"/>
             </Border.Effect>
-            <Grid Margin="12">
+            <Grid x:Name="InnerLayout" Margin="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                <DockPanel x:Name="HeaderPanel" Grid.Row="0" Margin="0,0,0,6">
                     <Button Content="✕" Click="BtnClose_Click" DockPanel.Dock="Right"
                             Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="Transparent"
                             FontSize="14" Padding="4,0" Cursor="Hand" MinWidth="24" ToolTip="Close"/>
+                    <Button x:Name="BtnMinimize" Content="—" DockPanel.Dock="Right"
+                            Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="Transparent"
+                            FontSize="14" Padding="4,0" Cursor="Hand" MinWidth="24" ToolTip="Minimize"/>
                     <Button Content="⚙" Click="BtnSettings_Click" DockPanel.Dock="Right"
                             Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="Transparent"
                             FontSize="14" Padding="4,0" Cursor="Hand" MinWidth="24" ToolTip="Settings"/>
-                    <TextBlock Text="RAM" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBlock x:Name="TxtWidgetTitle" Text="RAM" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
                 </DockPanel>
 
-                <Grid Grid.Row="1">
+                <Grid x:Name="ContentPanel" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>

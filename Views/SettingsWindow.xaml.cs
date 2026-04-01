@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using PrismPane_Widgets.Models;
 using PrismPane_Widgets.Services;
@@ -37,6 +38,25 @@ public partial class SettingsWindow : Window
     private const string WeatherHotColorKey = "WeatherHotColor";
     private const string WeatherExtremeColorKey = "WeatherExtremeColor";
     private const string VideoBackgroundSourcePathKey = "VideoBackgroundSourcePath";
+    private const string NetDownloadColorKey = "NetDownloadColor";
+    private const string NetUploadColorKey = "NetUploadColor";
+    private const string DiskDriveKey = "DiskDrive";
+    private const string DiskLowColorKey = "DiskLowColor";
+    private const string DiskMediumColorKey = "DiskMediumColor";
+    private const string DiskHighColorKey = "DiskHighColor";
+    private const string GpuLowColorKey = "GpuLowColor";
+    private const string GpuMediumColorKey = "GpuMediumColor";
+    private const string GpuHighColorKey = "GpuHighColor";
+    private const string NoteFontFamilyKey = "NoteFontFamily";
+    private const string NoteFontSizeKey = "NoteFontSize";
+    private const string NoteFontColorKey = "NoteFontColor";
+    private const string SlideshowFolderKey = "SlideshowFolder";
+    private const string SlideshowIntervalKey = "SlideshowInterval";
+    private const string SlideshowRandomKey = "SlideshowRandom";
+    private const string RssFeedUrlKey = "RssFeedUrl";
+    private const string RssMaxItemsKey = "RssMaxItems";
+    private const string RssRefreshIntervalKey = "RssRefreshInterval";
+    private const string RssRefreshUnitKey = "RssRefreshUnit";
 
     private static readonly HttpClient GeocodeHttpClient = CreateGeocodeHttpClient();
 
@@ -79,6 +99,7 @@ public partial class SettingsWindow : Window
     {
         _loading = true;
         TxtAccentColor.Text = _settings.AccentColor;
+        SetSwatch(SwatchAccentColor, _settings.AccentColor);
 
         // Theme mode
         CmbThemeMode.SelectedIndex = _settings.ThemeMode switch
@@ -108,6 +129,9 @@ public partial class SettingsWindow : Window
     {
         if (_widgetIdOverride is not null)
         {
+            NavSidebar.Visibility = Visibility.Collapsed;
+            SectionAppearance.Visibility = Visibility.Collapsed;
+            SectionWidgets.Visibility = Visibility.Visible;
             PanelThemeSettings.Visibility = Visibility.Collapsed;
             PanelGeneralSettings.Visibility = Visibility.Collapsed;
             PanelWidgetSettings.Visibility = Visibility.Visible;
@@ -117,6 +141,8 @@ public partial class SettingsWindow : Window
             return;
         }
 
+        SectionAppearance.Visibility = Visibility.Visible;
+        SectionWidgets.Visibility = Visibility.Collapsed;
         PanelWidgetSettings.Visibility = Visibility.Collapsed;
         PanelThemeSettings.Visibility = Visibility.Visible;
         PanelGeneralSettings.Visibility = Visibility.Visible;
@@ -144,6 +170,15 @@ public partial class SettingsWindow : Window
         TxtNoActiveWidgets.Visibility = activeWidgets.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private void NavList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading) return;
+        if (NavList.SelectedItem is not System.Windows.Controls.ListBoxItem item || item.Tag is not string tag) return;
+
+        SectionAppearance.Visibility = tag == "Appearance" ? Visibility.Visible : Visibility.Collapsed;
+        SectionWidgets.Visibility = tag == "Widgets" ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     private void LoadWidgetTypes()
     {
         if (_extManager is null)
@@ -154,27 +189,41 @@ public partial class SettingsWindow : Window
 
         var builtins = new[]
         {
-            new ExtensionInfo { Name = "Folder", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "ShortcutPanel", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "TitleBar", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "Clock", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "CpuMonitor", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "RamMonitor", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "Weather", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "Video Widget", Kind = ExtensionKind.Widget, IsEnabled = true },
-            new ExtensionInfo { Name = "Media Control", Kind = ExtensionKind.Widget, IsEnabled = true }
+            new ExtensionInfo { Name = "Folder", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" },
+            new ExtensionInfo { Name = "ShortcutPanel", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" },
+            new ExtensionInfo { Name = "TitleBar", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" },
+            new ExtensionInfo { Name = "Clock", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" },
+            new ExtensionInfo { Name = "CpuMonitor", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Monitoring" },
+            new ExtensionInfo { Name = "RamMonitor", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Monitoring" },
+            new ExtensionInfo { Name = "Weather", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" },
+            new ExtensionInfo { Name = "Video Widget", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Media" },
+            new ExtensionInfo { Name = "Media Control", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Media" },
+            new ExtensionInfo { Name = "NetworkTraffic", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Monitoring" },
+            new ExtensionInfo { Name = "DiskUsage", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Monitoring" },
+            new ExtensionInfo { Name = "GpuMonitor", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Monitoring" },
+            new ExtensionInfo { Name = "Sticky Notes", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" },
+            new ExtensionInfo { Name = "Slideshow", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Media" },
+            new ExtensionInfo { Name = "RSS Feed", Kind = ExtensionKind.Widget, IsEnabled = true, Category = "Productivity" }
         };
 
         var scripted = _extManager.Extensions
             .Where(e => e.Kind == ExtensionKind.Widget && e.IsEnabled)
             .ToList();
 
-        LstWidgetTypes.ItemsSource = builtins
+        var all = builtins
             .Concat(scripted)
             .GroupBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
             .Select(g => g.First())
             .OrderBy(e => e.Name)
             .ToList();
+
+        var categoryOrder = new[] { "Monitoring", "Media", "Productivity", "Other" };
+        var grouped = all
+            .GroupBy(e => e.Category)
+            .OrderBy(g => Array.IndexOf(categoryOrder, g.Key) is var i && i < 0 ? int.MaxValue : i)
+            .ToList();
+
+        LstWidgetTypes.ItemsSource = grouped;
     }
 
     // ── Theme mode ──────────────────────────────────────────
@@ -232,6 +281,46 @@ public partial class SettingsWindow : Window
         SetSwatch(SwatchSecondary, TxtCustomSecondary.Text);
         SetSwatch(SwatchDropdownBg, TxtCustomDropdownBg.Text);
         SetSwatch(SwatchDropdownHover, TxtCustomDropdownHover.Text);
+
+        SetSwatch(SwatchAccentColor, TxtAccentColor.Text);
+
+        SetSwatch(SwatchWcWindowBg, TxtWcWindowBg.Text);
+        SetSwatch(SwatchWcControlBg, TxtWcControlBg.Text);
+        SetSwatch(SwatchWcForeground, TxtWcForeground.Text);
+        SetSwatch(SwatchWcAccent, TxtWcAccent.Text);
+        SetSwatch(SwatchWcBorder, TxtWcBorder.Text);
+        SetSwatch(SwatchWcMuted, TxtWcMuted.Text);
+
+        SetSwatch(SwatchClockHourColor, TxtClockHourColor.Text);
+        SetSwatch(SwatchClockMinuteColor, TxtClockMinuteColor.Text);
+        SetSwatch(SwatchClockSecondColor, TxtClockSecondColor.Text);
+
+        SetSwatch(SwatchCpuLowColor, TxtCpuLowColor.Text);
+        SetSwatch(SwatchCpuMediumColor, TxtCpuMediumColor.Text);
+        SetSwatch(SwatchCpuHighColor, TxtCpuHighColor.Text);
+
+        SetSwatch(SwatchRamLowColor, TxtRamLowColor.Text);
+        SetSwatch(SwatchRamMediumColor, TxtRamMediumColor.Text);
+        SetSwatch(SwatchRamHighColor, TxtRamHighColor.Text);
+
+        SetSwatch(SwatchWeatherFreezeColor, TxtWeatherFreezeColor.Text);
+        SetSwatch(SwatchWeatherCoolColor, TxtWeatherCoolColor.Text);
+        SetSwatch(SwatchWeatherWarmColor, TxtWeatherWarmColor.Text);
+        SetSwatch(SwatchWeatherHotColor, TxtWeatherHotColor.Text);
+        SetSwatch(SwatchWeatherExtremeColor, TxtWeatherExtremeColor.Text);
+
+        SetSwatch(SwatchNetDownloadColor, TxtNetDownloadColor.Text);
+        SetSwatch(SwatchNetUploadColor, TxtNetUploadColor.Text);
+
+        SetSwatch(SwatchDiskLowColor, TxtDiskLowColor.Text);
+        SetSwatch(SwatchDiskMediumColor, TxtDiskMediumColor.Text);
+        SetSwatch(SwatchDiskHighColor, TxtDiskHighColor.Text);
+
+        SetSwatch(SwatchGpuLowColor, TxtGpuLowColor.Text);
+        SetSwatch(SwatchGpuMediumColor, TxtGpuMediumColor.Text);
+        SetSwatch(SwatchGpuHighColor, TxtGpuHighColor.Text);
+
+        SetSwatch(SwatchStickyNoteFontColor, TxtStickyNoteFontColor.Text);
     }
 
     private static void SetSwatch(Border swatch, string hex)
@@ -333,12 +422,38 @@ public partial class SettingsWindow : Window
     private static string NormalizeWidgetKind(string kind) =>
         kind == "DesktopFolder" ? "Folder" : kind;
 
+    private static string BuildDefaultWidgetName(string widgetId)
+    {
+        var separatorIndex = widgetId.LastIndexOf('_');
+        var kind = separatorIndex > 0 ? widgetId[..separatorIndex] : widgetId;
+        return NormalizeWidgetKind(kind) switch
+        {
+            "ShortcutPanel" => "Shortcut Panel",
+            "TitleBar" => "Title Bar",
+            "CpuMonitor" => "CPU Monitor",
+            "RamMonitor" => "RAM Monitor",
+            "VideoBackground" => "Video Widget",
+            "MediaControl" => "Media Control",
+            "NetworkTraffic" => "Network Traffic",
+            "DiskUsage" => "Disk Usage",
+            "GpuMonitor" => "GPU Monitor",
+            "StickyNotes" => "Sticky Notes",
+            "RssFeed" => "RSS Feed",
+            _ => NormalizeWidgetKind(kind)
+        };
+    }
+
     private static string NormalizeSpawnWidgetKind(string kind) => kind switch
     {
         "CPU Monitor" => "CpuMonitor",
         "RAM Monitor" => "RamMonitor",
         "Video Widget" => "VideoBackground",
         "Media Control" => "MediaControl",
+        "Network Traffic" => "NetworkTraffic",
+        "Disk Usage" => "DiskUsage",
+        "GPU Monitor" => "GpuMonitor",
+        "Sticky Notes" => "StickyNotes",
+        "RSS Feed" => "RssFeed",
         _ => NormalizeWidgetKind(kind)
     };
 
@@ -358,8 +473,13 @@ public partial class SettingsWindow : Window
         _loading = true;
         var ws = ResolveWidgetSettings(widgetId);
 
-        SliderOpacity.Value = ws.Opacity;
-        TxtOpacityValue.Text = $"{(int)(ws.Opacity * 100)}%";
+        // Name field — default to the friendly kind name when Title is empty
+        var defaultName = BuildDefaultWidgetName(widgetId);
+        TxtWidgetName.Text = !string.IsNullOrWhiteSpace(ws.Title) ? ws.Title : defaultName;
+
+        SliderOpacity.Value = Math.Max(ws.Opacity, SliderOpacity.Minimum);
+        TxtOpacityValue.Text = $"{(int)(SliderOpacity.Value * 100)}%";
+        ChkShowBorder.IsChecked = ws.ShowBorder;
         ChkTopmost.IsChecked = ws.Topmost;
         ChkStartMinimized.IsChecked = ws.IsMinimized;
 
@@ -376,6 +496,10 @@ public partial class SettingsWindow : Window
         PanelRamSettings.Visibility = kind == "RamMonitor" ? Visibility.Visible : Visibility.Collapsed;
         PanelWeatherSettings.Visibility = kind == "Weather" ? Visibility.Visible : Visibility.Collapsed;
         PanelVideoBackgroundSettings.Visibility = kind == "VideoBackground" ? Visibility.Visible : Visibility.Collapsed;
+        PanelStickyNotesSettings.Visibility = kind == "StickyNotes" ? Visibility.Visible : Visibility.Collapsed;
+        PanelSlideshowSettings.Visibility = kind == "Slideshow" ? Visibility.Visible : Visibility.Collapsed;
+        PanelRssFeedSettings.Visibility = kind == "RssFeed" ? Visibility.Visible : Visibility.Collapsed;
+        PanelShortcutPanelSettings.Visibility = kind == "ShortcutPanel" ? Visibility.Visible : Visibility.Collapsed;
 
         if (kind == "Folder")
         {
@@ -411,6 +535,18 @@ public partial class SettingsWindow : Window
         if (kind == "VideoBackground")
             LoadVideoBackgroundFields(ws);
 
+        if (kind == "StickyNotes")
+            LoadStickyNotesFields(ws);
+
+        if (kind == "Slideshow")
+            LoadSlideshowFields(ws);
+
+        if (kind == "RssFeed")
+            LoadRssFeedFields(ws);
+
+        if (kind == "ShortcutPanel")
+            LoadShortcutPanelFields(ws);
+
         _loading = false;
     }
 
@@ -424,6 +560,10 @@ public partial class SettingsWindow : Window
         TxtClockHourColor.Text = ReadClockColorSetting(ws, ClockHourColorKey, "#FFE5E7EB");
         TxtClockMinuteColor.Text = ReadClockColorSetting(ws, ClockMinuteColorKey, "#FF93C5FD");
         TxtClockSecondColor.Text = ReadClockColorSetting(ws, ClockSecondColorKey, "#FFFCA5A5");
+
+        SetSwatch(SwatchClockHourColor, TxtClockHourColor.Text);
+        SetSwatch(SwatchClockMinuteColor, TxtClockMinuteColor.Text);
+        SetSwatch(SwatchClockSecondColor, TxtClockSecondColor.Text);
     }
 
     private static string ReadClockColorSetting(WidgetSettings ws, string key, string fallback)
@@ -443,6 +583,10 @@ public partial class SettingsWindow : Window
         TxtCpuLowColor.Text = ReadClockColorSetting(ws, CpuLowColorKey, "#FF34D399");
         TxtCpuMediumColor.Text = ReadClockColorSetting(ws, CpuMediumColorKey, "#FFFBBF24");
         TxtCpuHighColor.Text = ReadClockColorSetting(ws, CpuHighColorKey, "#FFF87171");
+
+        SetSwatch(SwatchCpuLowColor, TxtCpuLowColor.Text);
+        SetSwatch(SwatchCpuMediumColor, TxtCpuMediumColor.Text);
+        SetSwatch(SwatchCpuHighColor, TxtCpuHighColor.Text);
     }
 
     private void LoadRamFields(WidgetSettings ws)
@@ -455,6 +599,10 @@ public partial class SettingsWindow : Window
         TxtRamLowColor.Text = ReadClockColorSetting(ws, RamLowColorKey, "#FF34D399");
         TxtRamMediumColor.Text = ReadClockColorSetting(ws, RamMediumColorKey, "#FFFBBF24");
         TxtRamHighColor.Text = ReadClockColorSetting(ws, RamHighColorKey, "#FFF87171");
+
+        SetSwatch(SwatchRamLowColor, TxtRamLowColor.Text);
+        SetSwatch(SwatchRamMediumColor, TxtRamMediumColor.Text);
+        SetSwatch(SwatchRamHighColor, TxtRamHighColor.Text);
     }
 
     private void LoadWeatherFields(WidgetSettings ws)
@@ -482,6 +630,12 @@ public partial class SettingsWindow : Window
         TxtWeatherWarmColor.Text = ReadClockColorSetting(ws, WeatherWarmColorKey, "#FFFACC15");
         TxtWeatherHotColor.Text = ReadClockColorSetting(ws, WeatherHotColorKey, "#FFFB923C");
         TxtWeatherExtremeColor.Text = ReadClockColorSetting(ws, WeatherExtremeColorKey, "#FFEF4444");
+
+        SetSwatch(SwatchWeatherFreezeColor, TxtWeatherFreezeColor.Text);
+        SetSwatch(SwatchWeatherCoolColor, TxtWeatherCoolColor.Text);
+        SetSwatch(SwatchWeatherWarmColor, TxtWeatherWarmColor.Text);
+        SetSwatch(SwatchWeatherHotColor, TxtWeatherHotColor.Text);
+        SetSwatch(SwatchWeatherExtremeColor, TxtWeatherExtremeColor.Text);
     }
 
     private void LoadWidgetColorFields(WidgetSettings ws)
@@ -493,6 +647,14 @@ public partial class SettingsWindow : Window
         TxtWcAccent.Text = c.Accent;
         TxtWcBorder.Text = c.Border;
         TxtWcMuted.Text = c.MutedForeground;
+
+        SetSwatch(SwatchWcWindowBg, TxtWcWindowBg.Text);
+        SetSwatch(SwatchWcControlBg, TxtWcControlBg.Text);
+        SetSwatch(SwatchWcForeground, TxtWcForeground.Text);
+        SetSwatch(SwatchWcAccent, TxtWcAccent.Text);
+        SetSwatch(SwatchWcBorder, TxtWcBorder.Text);
+        SetSwatch(SwatchWcMuted, TxtWcMuted.Text);
+
         PanelWidgetColors.Visibility = ws.CustomColors is not null ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -501,6 +663,80 @@ public partial class SettingsWindow : Window
         TxtVideoBackgroundPath.Text = ws.Custom.TryGetValue(VideoBackgroundSourcePathKey, out var savedPath)
             ? savedPath
             : string.Empty;
+    }
+
+    private void LoadStickyNotesFields(WidgetSettings ws)
+    {
+        if (CmbStickyNoteFont.Items.Count == 0)
+        {
+            foreach (var family in System.Windows.Media.Fonts.SystemFontFamilies.OrderBy(f => f.Source))
+                CmbStickyNoteFont.Items.Add(family.Source);
+        }
+
+        var font = ws.Custom.TryGetValue(NoteFontFamilyKey, out var savedFont) && !string.IsNullOrWhiteSpace(savedFont)
+            ? savedFont
+            : "Segoe UI";
+
+        CmbStickyNoteFont.SelectedItem = font;
+        if (CmbStickyNoteFont.SelectedItem is null)
+            CmbStickyNoteFont.SelectedIndex = 0;
+
+        var fontSize = ws.Custom.TryGetValue(NoteFontSizeKey, out var savedSize)
+            && double.TryParse(savedSize, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var parsedSize)
+            ? Math.Clamp(parsedSize, 8, 45)
+            : 14;
+        SliderStickyNoteFontSize.Value = fontSize;
+        TxtStickyNoteFontSizeValue.Text = ((int)Math.Round(fontSize)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        TxtStickyNoteFontColor.Text = ws.Custom.TryGetValue(NoteFontColorKey, out var savedColor)
+            ? savedColor
+            : string.Empty;
+
+        SetSwatch(SwatchStickyNoteFontColor, TxtStickyNoteFontColor.Text);
+    }
+
+    private void LoadSlideshowFields(WidgetSettings ws)
+    {
+        TxtSlideshowFolder.Text = ws.Custom.TryGetValue(SlideshowFolderKey, out var savedFolder)
+            ? savedFolder
+            : string.Empty;
+
+        TxtSlideshowInterval.Text = ws.Custom.TryGetValue(SlideshowIntervalKey, out var savedInterval)
+            ? savedInterval
+            : "5";
+
+        ChkSlideshowRandom.IsChecked = ws.Custom.TryGetValue(SlideshowRandomKey, out var savedRandom)
+            && string.Equals(savedRandom, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void LoadRssFeedFields(WidgetSettings ws)
+    {
+        TxtRssFeedUrl.Text = ws.Custom.TryGetValue(RssFeedUrlKey, out var savedUrl) && !string.IsNullOrWhiteSpace(savedUrl)
+            ? savedUrl
+            : "https://feeds.bbci.co.uk/news/rss.xml";
+
+        TxtRssMaxItems.Text = ws.Custom.TryGetValue(RssMaxItemsKey, out var savedMax)
+            ? savedMax
+            : "15";
+
+        TxtRssRefreshInterval.Text = ws.Custom.TryGetValue(RssRefreshIntervalKey, out var savedInterval)
+            ? savedInterval
+            : "3";
+
+        var unit = ws.Custom.TryGetValue(RssRefreshUnitKey, out var savedUnit) ? savedUnit : "Hours";
+        CmbRssRefreshUnit.SelectedIndex = unit switch
+        {
+            "Seconds" => 0,
+            "Minutes" => 1,
+            "Days" => 3,
+            _ => 2 // Hours
+        };
+    }
+
+    private void LoadShortcutPanelFields(WidgetSettings ws)
+    {
+        LstShortcuts.ItemsSource = ws.Shortcuts;
+        TxtNoShortcuts.Visibility = ws.Shortcuts.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private ThemeColors? ReadWidgetColorFields()
@@ -534,6 +770,40 @@ public partial class SettingsWindow : Window
         TxtOpacityValue.Text = $"{(int)(SliderOpacity.Value * 100)}%";
     }
 
+    private void SliderStickyNoteFontSize_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (TxtStickyNoteFontSizeValue is null) return;
+        TxtStickyNoteFontSizeValue.Text = ((int)Math.Round(SliderStickyNoteFontSize.Value)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private void Slider_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is not Slider slider)
+            return;
+
+        if (e.OriginalSource is DependencyObject source && FindAncestor<Thumb>(source) is not null)
+            return;
+
+        if (slider.Template.FindName("PART_Track", slider) is not Track track)
+            return;
+
+        var point = e.GetPosition(track);
+        double ratio;
+
+        if (slider.Orientation == System.Windows.Controls.Orientation.Horizontal)
+        {
+            ratio = track.ActualWidth <= 0 ? 0 : point.X / track.ActualWidth;
+        }
+        else
+        {
+            ratio = track.ActualHeight <= 0 ? 0 : 1 - (point.Y / track.ActualHeight);
+        }
+
+        ratio = Math.Clamp(ratio, 0, 1);
+        slider.Value = slider.Minimum + ((slider.Maximum - slider.Minimum) * ratio);
+        e.Handled = true;
+    }
+
     private void ChkTopmost_Changed(object sender, RoutedEventArgs e)
     {
         // Just tracks state — saved on Save click
@@ -546,7 +816,13 @@ public partial class SettingsWindow : Window
         var kind = widgetId.Contains('_') ? widgetId[..widgetId.LastIndexOf('_')] : widgetId;
         kind = NormalizeWidgetKind(kind);
 
+        // Name / Title
+        var name = TxtWidgetName.Text.Trim();
+        var defaultName = BuildDefaultWidgetName(widgetId);
+        ws.Title = string.Equals(name, defaultName, StringComparison.Ordinal) ? null : name;
+
         ws.Opacity = SliderOpacity.Value;
+        ws.ShowBorder = ChkShowBorder.IsChecked == true;
         ws.Topmost = ChkTopmost.IsChecked == true;
         ws.IsMinimized = ChkStartMinimized.IsChecked == true;
         ws.CustomColors = ReadWidgetColorFields();
@@ -640,6 +916,30 @@ public partial class SettingsWindow : Window
             ws.Custom[VideoBackgroundSourcePathKey] = TxtVideoBackgroundPath.Text.Trim();
         }
 
+        if (kind == "StickyNotes")
+        {
+            ws.Custom[NoteFontFamilyKey] = CmbStickyNoteFont.SelectedItem is string font ? font : "Segoe UI";
+            ws.Custom[NoteFontSizeKey] = ((int)Math.Round(SliderStickyNoteFontSize.Value)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            ws.Custom[NoteFontColorKey] = TxtStickyNoteFontColor.Text.Trim();
+        }
+
+        if (kind == "Slideshow")
+        {
+            ws.Custom[SlideshowFolderKey] = TxtSlideshowFolder.Text.Trim();
+            ws.Custom[SlideshowIntervalKey] = TxtSlideshowInterval.Text.Trim();
+            ws.Custom[SlideshowRandomKey] = ChkSlideshowRandom.IsChecked == true ? "true" : "false";
+        }
+
+        if (kind == "RssFeed")
+        {
+            ws.Custom[RssFeedUrlKey] = TxtRssFeedUrl.Text.Trim();
+            ws.Custom[RssMaxItemsKey] = TxtRssMaxItems.Text.Trim();
+            ws.Custom[RssRefreshIntervalKey] = TxtRssRefreshInterval.Text.Trim();
+            ws.Custom[RssRefreshUnitKey] = CmbRssRefreshUnit.SelectedItem is System.Windows.Controls.ComboBoxItem cbi && cbi.Tag is string tag
+                ? tag
+                : "Hours";
+        }
+
         if (_widgetSettingsOverride is not null && _widgetIdOverride is not null)
             _settings.Widgets[_widgetIdOverride] = ws;
     }
@@ -727,6 +1027,38 @@ public partial class SettingsWindow : Window
             TxtVideoBackgroundPath.Text = dialog.FileName;
     }
 
+    private void BtnEditShortcut_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button btn || btn.Tag is not ShortcutItem shortcut)
+            return;
+
+        var widgetId = _widgetIdOverride ?? SelectedWidgetId;
+        var ws = ResolveWidgetSettings(widgetId);
+
+        var dlg = new ShortcutEditDialog(shortcut);
+        if (IsLoaded && PresentationSource.FromVisual(this) is not null)
+            dlg.Owner = this;
+
+        if (dlg.ShowDialog() == true)
+        {
+            LoadShortcutPanelFields(ws);
+            _settings.Save();
+            _widgetSettingsApplied?.Invoke();
+        }
+    }
+
+    private void BtnBrowseSlideshowFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new System.Windows.Forms.FolderBrowserDialog
+        {
+            Description = "Select a folder containing images",
+            UseDescriptionForTitle = true
+        };
+
+        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            TxtSlideshowFolder.Text = dlg.SelectedPath;
+    }
+
     // ── Save / Close ────────────────────────────────────────
     private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
@@ -777,6 +1109,15 @@ public partial class SettingsWindow : Window
 
         _settings.Save();
         _widgetSettingsApplied?.Invoke();
+
+        // Update the group tab label if this widget is currently grouped
+        if (isWidgetSettings)
+        {
+            var widgetId = _widgetIdOverride ?? SelectedWidgetId;
+            var ws = ResolveWidgetSettings(widgetId);
+            MainWindow.RefreshWidgetGroupTab(widgetId, ws);
+        }
+
         if (!isWidgetSettings)
             _settingsApplied?.Invoke();
     }

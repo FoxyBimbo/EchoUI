@@ -12,6 +12,12 @@ public class ShortcutItem
     public string Arguments { get; set; } = string.Empty;
 
     /// <summary>
+    /// Optional URL. When set, the shortcut opens this URL in the default browser.
+    /// If a URL is provided the <see cref="TargetPath"/> is not required.
+    /// </summary>
+    public string Url { get; set; } = string.Empty;
+
+    /// <summary>
     /// Optional path to a custom icon file. When empty the shell icon for
     /// <see cref="TargetPath"/> is used.
     /// </summary>

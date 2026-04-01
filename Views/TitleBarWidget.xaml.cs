@@ -67,6 +67,7 @@ public partial class TitleBarWidget : Window
         ThemeHelper.ApplyToElement(this, ws.CustomColors);
         Topmost = ws.Topmost;
         Opacity = ws.Opacity;
+        RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(0, 0, 0, 1) : new Thickness(0);
 
         if (ws.Height is > 0)
             Height = ws.Height.Value;

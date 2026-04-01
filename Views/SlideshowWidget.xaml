@@ -1,7 +1,7 @@
-<Window x:Class="PrismPane_Widgets.Views.WeatherWidget"
+<Window x:Class="PrismPane_Widgets.Views.SlideshowWidget"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Weather" Width="280" Height="260"
+        Title="Slideshow" Width="360" Height="280"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent" Topmost="False"
         ShowInTaskbar="False" ResizeMode="CanResize">
@@ -15,7 +15,6 @@
             <Border.Effect>
                 <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5" Color="Black"/>
             </Border.Effect>
-
             <Grid x:Name="InnerLayout" Margin="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -32,32 +31,35 @@
                     <Button Content="⚙" Click="BtnSettings_Click" DockPanel.Dock="Right"
                             Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="Transparent"
                             FontSize="14" Padding="4,0" Cursor="Hand" MinWidth="24" ToolTip="Settings"/>
-                    <TextBlock x:Name="TxtLocationTitle" Text="New York City, New York, USA" FontSize="14" FontWeight="Bold"
-                               Foreground="{DynamicResource ForegroundBrush}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="TxtWidgetTitle" Text="Slideshow" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
                 </DockPanel>
 
                 <Grid x:Name="ContentPanel" Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock x:Name="TxtCurrentTemp" Grid.Row="0" Text="--°C" FontSize="28" FontWeight="SemiBold"
-                               Foreground="{DynamicResource ForegroundBrush}" HorizontalAlignment="Center"/>
-
-                    <TextBlock x:Name="TxtCurrentCondition" Grid.Row="1" Text="Loading weather..." Margin="0,4,0,8"
-                               Foreground="{DynamicResource MutedForegroundBrush}" HorizontalAlignment="Center"/>
-
-                    <Border Grid.Row="2" Background="{DynamicResource ControlBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <StackPanel x:Name="ForecastPanel"/>
-                        </ScrollViewer>
+                    <Border Grid.Row="0" Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="8"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" ClipToBounds="True">
+                        <Grid>
+                            <Image x:Name="ImgSlideshow" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            <TextBlock x:Name="TxtNoImages" Text="No images found. Open settings to select a folder."
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource MutedForegroundBrush}" TextAlignment="Center" Margin="12"/>
+                        </Grid>
                     </Border>
 
-                    <TextBlock x:Name="TxtLastUpdated" Grid.Row="3" Margin="0,8,0,0" FontSize="11"
-                               Foreground="{DynamicResource MutedForegroundBrush}" HorizontalAlignment="Right"/>
+                    <DockPanel Grid.Row="1" Margin="0,6,0,0">
+                        <Button Content="◀" Click="BtnPrevious_Click" DockPanel.Dock="Left"
+                                Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="Transparent"
+                                FontSize="14" Padding="6,2" Cursor="Hand" ToolTip="Previous"/>
+                        <Button Content="▶" Click="BtnNext_Click" DockPanel.Dock="Right"
+                                Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}" BorderBrush="Transparent"
+                                FontSize="14" Padding="6,2" Cursor="Hand" ToolTip="Next"/>
+                        <TextBlock x:Name="TxtImageInfo" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MutedForegroundBrush}" FontSize="11"/>
+                    </DockPanel>
                 </Grid>
             </Grid>
         </Border>

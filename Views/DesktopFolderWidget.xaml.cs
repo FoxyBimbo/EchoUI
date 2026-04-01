@@ -110,6 +110,7 @@ public partial class DesktopFolderWidget : Window
         Topmost = ws.Topmost;
         _defaultTopmost = ws.Topmost;
         Opacity = ws.Opacity;
+        RootBorder.BorderThickness = ws.ShowBorder ? new Thickness(1.5) : new Thickness(0);
 
         var activeFolder = ws.ActiveFolder;
         if (string.IsNullOrEmpty(activeFolder))
@@ -497,9 +498,14 @@ public partial class DesktopFolderWidget : Window
 
         items = SortItems(items);
 
-        TxtFolderName.Text = Path.GetFileName(_folderPath);
-        if (string.IsNullOrEmpty(TxtFolderName.Text))
-            TxtFolderName.Text = _folderPath;
+        if (!string.IsNullOrWhiteSpace(_widgetSettings.Title))
+            TxtFolderName.Text = _widgetSettings.Title;
+        else
+        {
+            TxtFolderName.Text = Path.GetFileName(_folderPath);
+            if (string.IsNullOrEmpty(TxtFolderName.Text))
+                TxtFolderName.Text = _folderPath;
+        }
 
         FileGrid.ItemsSource = items;
     }
@@ -817,12 +823,19 @@ public partial class DesktopFolderWidget : Window
         if (e.LeftButton != MouseButtonState.Pressed)
             return;
 
+        if (MainWindow.DragWidgetGroup(this))
+            return;
+
         if (_isDocked)
             Undock(true);
 
         DragMove();
-        ResetUpwardExpansion();
-        TryAutoDockFromPosition();
+
+        if (!MainWindow.SnapManager.OnDragCompleted(this))
+        {
+            ResetUpwardExpansion();
+            TryAutoDockFromPosition();
+        }
     }
 
     private void ResetUpwardExpansion()

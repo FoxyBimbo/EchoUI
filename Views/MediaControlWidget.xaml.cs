@@ -57,6 +57,7 @@ public partial class MediaControlWidget : Window
         _appSettings.Widgets[_widgetId] = _widgetSettings;
         ThemeHelper.ApplyToElement(this, _widgetSettings.CustomColors);
         Opacity = _widgetSettings.Opacity;
+        RootBorder.BorderThickness = _widgetSettings.ShowBorder ? new Thickness(1) : new Thickness(0);
         Topmost = false;
 
         Width = _widgetSettings.Width is > 0 ? _widgetSettings.Width.Value : 320;
