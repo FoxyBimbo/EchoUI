@@ -6,5 +6,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="EchoUI.csproj" />
+  <Project Path="PrismPane-Widgets.csproj" />
 </Solution>
